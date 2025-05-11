@@ -1,59 +1,154 @@
 'use client';
 
+import { useState } from 'react';
 import styles from './page.module.css';
 
-export default function Home() {
+const initialBoard = [
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+];
+
+const DIRECTIONS = [
+  [0, -1],
+  [1, -1],
+  [1, 0],
+  [1, 1],
+  [0, 1],
+  [-1, 1],
+  [-1, 0],
+  [-1, -1],
+];
+
+function shuffleBombMap(y: number, x: number, bombMap: number[][], userInputBoard: number[][]) {
+  if (userInputBoard.flat().filter((num) => num === -1).length !== 0) {
+    return bombMap;
+  }
+  if (bombMap.flat().filter((num) => num === 1).length === 10) {
+    return bombMap;
+  }
+
+  const newBombMap = structuredClone(bombMap);
+  let bombCount = 0;
+  const maxBombs = 10;
+
+  while (bombCount < maxBombs) {
+    const cy = Math.floor(Math.random() * 9);
+    const cx = Math.floor(Math.random() * 9);
+
+    if (cy === y && cx === x) continue;
+    if (Math.abs(cy - y) <= 1 && Math.abs(cx - x) <= 1) continue;
+
+    if (newBombMap[cy][cx] === 0) {
+      newBombMap[cy][cx] = 1;
+      bombCount++;
+    }
+  }
+
+  return newBombMap;
+}
+
+const checkBomCount = (cy: number, cx: number, board: number[][]) => {
+  let countBom = 0;
+  for (const direction of DIRECTIONS) {
+    const dx = direction[0];
+    const dy = direction[1];
+    if (board[cy + dy] === undefined) continue;
+    if (board[cy + dy][cx + dx] === 1) countBom++;
+  }
+  return countBom;
+};
+
+// const checkZeroRoup = (y: number, x: number, newBombMap: number[][]) => {
+//   const newUserInputBoard = structuredClone(newBombMap);
+//   if (newBombMap[y][x] !== 0) return;
+//   const zeroCell: [number, number][] = [];
+//   const visited = new Set<string>();
+
+//   const checkCell = (cy: number, cx: number) => {
+//     const key = `${cy},${cx}`;
+//     if (visited.has(key)) return;
+//     visited.add(key);
+
+//     if (newBombMap[cy][cx] !== 0) return;
+
+//     for (const direction of DIRECTIONS) {
+//       const dx = direction[0];
+//       const dy = direction[1];
+//       if (newBombMap[cy + dy] === undefined) continue;
+//       if (newBombMap[cy + dy][cx + dx] === 0) {
+//         zeroCell.push([cx + dx, cy + dy]);
+//         checkCell(cy + dy, cx + dx);
+//       }
+//     }
+//   };
+
+//   checkCell(y, x);
+
+//   for (const [x, y] of zeroCell) {
+//     newUserInputBoard[y][x] = -1;
+//   }
+
+//   return true;
+// };
+
+const Home = () => {
+  const [userInputBoard, setUserInputBoard] = useState(initialBoard);
+  const [bombMap, setBombMap] = useState(initialBoard);
+
+  const handleOnClick = (y: number, x: number) => {
+    console.log(bombMap);
+    console.log(userInputBoard);
+
+    if (bombMap[y][x] === 1 || bombMap[y][x] === -1) return;
+
+    const newBombMap = shuffleBombMap(y, x, bombMap, userInputBoard);
+    setBombMap(newBombMap);
+
+    // const newUserInput = structuredClone(userInputBoard);
+    // if (newBombMap[y][x] === 0) {
+    //   if (checkZeroRoup(y, x, newBombMap)) {
+    //     newUserInput[y][x] = -1;
+    //   }
+    //   setUserInputBoard(newUserInput);
+    // }
+    const viewBoard = structuredClone(userInputBoard);
+    if (userInputBoard.flat().filter((num) => num === -1).length !== 0) {
+      for (let cy = 0; cy < 9; cy++) {
+        for (let cx = 0; cx < 9; cx++) {
+          if (userInputBoard[cy][cx] === -1) {
+            viewBoard[cy][cx] = checkBomCount(cy, cx, bombMap);
+          }
+        }
+      }
+    }
+    setUserInputBoard(viewBoard);
+  };
+
   return (
     <div className={styles.container}>
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code} style={{ backgroundColor: '#fafafa' }}>
-            src/app/page.tsx
-          </code>
-        </p>
-
-        <div className={styles.grid}>
-          <a className={styles.card} href="https://nextjs.org/docs">
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a className={styles.card} href="https://nextjs.org/learn">
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a className={styles.card} href="https://github.com/vercel/next.js/tree/master/examples">
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            className={styles.card}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>Instantly deploy your Next.js site to a public URL with Vercel.</p>
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <img src="vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+      <div className={styles.board}>
+        {userInputBoard.map((row, y) =>
+          row.map((color, x) => (
+            <div key={`${x}-${y}`} className={styles.cell} onClick={() => handleOnClick(y, x)}>
+              <div
+                className={styles.stone}
+                style={{
+                  backgroundPositionX: userInputBoard[y][x] === -1 ? `${color * -22.5}px` : '30px',
+                }}
+              />
+            </div>
+          )),
+        )}
+      </div>
     </div>
   );
-}
+};
+
+export default Home;
