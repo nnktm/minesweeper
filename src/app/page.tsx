@@ -65,70 +65,69 @@ const checkBomCount = (cy: number, cx: number, board: number[][]) => {
   return countBom;
 };
 
-// const checkZeroRoup = (y: number, x: number, newBombMap: number[][]) => {
-//   const newUserInputBoard = structuredClone(newBombMap);
-//   if (newBombMap[y][x] !== 0) return;
-//   const zeroCell: [number, number][] = [];
-//   const visited = new Set<string>();
-
-//   const checkCell = (cy: number, cx: number) => {
-//     const key = `${cy},${cx}`;
-//     if (visited.has(key)) return;
-//     visited.add(key);
-
-//     if (newBombMap[cy][cx] !== 0) return;
-
-//     for (const direction of DIRECTIONS) {
-//       const dx = direction[0];
-//       const dy = direction[1];
-//       if (newBombMap[cy + dy] === undefined) continue;
-//       if (newBombMap[cy + dy][cx + dx] === 0) {
-//         zeroCell.push([cx + dx, cy + dy]);
-//         checkCell(cy + dy, cx + dx);
-//       }
-//     }
-//   };
-
-//   checkCell(y, x);
-
-//   for (const [x, y] of zeroCell) {
-//     newUserInputBoard[y][x] = -1;
-//   }
-
-//   return true;
-// };
-
 const Home = () => {
   const [userInputBoard, setUserInputBoard] = useState(initialBoard);
   const [bombMap, setBombMap] = useState(initialBoard);
 
   const handleOnClick = (y: number, x: number) => {
-    console.log(bombMap);
-    console.log(userInputBoard);
-
     if (bombMap[y][x] === 1 || bombMap[y][x] === -1) return;
 
     const newBombMap = shuffleBombMap(y, x, bombMap, userInputBoard);
     setBombMap(newBombMap);
+    console.log(newBombMap);
 
-    // const newUserInput = structuredClone(userInputBoard);
-    // if (newBombMap[y][x] === 0) {
-    //   if (checkZeroRoup(y, x, newBombMap)) {
-    //     newUserInput[y][x] = -1;
-    //   }
-    //   setUserInputBoard(newUserInput);
-    // }
-    const viewBoard = structuredClone(userInputBoard);
+    const newUserInput = structuredClone(userInputBoard);
+    if (newBombMap[y][x] === 0) {
+      const zeroCell: [number, number][] = [];
+
+      const checkCell = (cy: number, cx: number) => {
+        if (zeroCell.some(([x, y]) => x === cx && y === cy)) return;
+
+        if (newBombMap[cy][cx] !== 0) return;
+
+        let hasBomb = false;
+        for (const direction of DIRECTIONS) {
+          const dx = direction[0];
+          const dy = direction[1];
+          if (newBombMap[cy + dy] === undefined || newBombMap[cy + dy][cx + dx] === undefined)
+            continue;
+          if (newBombMap[cy + dy][cx + dx] === 1) {
+            hasBomb = true;
+            break;
+          }
+        }
+
+        if (!hasBomb) {
+          zeroCell.push([cx, cy]);
+          for (const direction of DIRECTIONS) {
+            const dx = direction[0];
+            const dy = direction[1];
+            if (newBombMap[cy + dy] === undefined || newBombMap[cy + dy][cx + dx] === undefined)
+              continue;
+            if (newBombMap[cy + dy][cx + dx] === 0) {
+              checkCell(cy + dy, cx + dx);
+            }
+          }
+        }
+      };
+
+      checkCell(y, x);
+
+      for (const [x, y] of zeroCell) {
+        newUserInput[y][x] = -1;
+      }
+    }
     if (userInputBoard.flat().filter((num) => num === -1).length !== 0) {
       for (let cy = 0; cy < 9; cy++) {
         for (let cx = 0; cx < 9; cx++) {
           if (userInputBoard[cy][cx] === -1) {
-            viewBoard[cy][cx] = checkBomCount(cy, cx, bombMap);
+            newUserInput[cy][cx] = checkBomCount(cy, cx, bombMap);
           }
         }
       }
+      setUserInputBoard(newUserInput);
     }
-    setUserInputBoard(viewBoard);
+    console.log(newUserInput);
   };
 
   return (
@@ -140,7 +139,7 @@ const Home = () => {
               <div
                 className={styles.stone}
                 style={{
-                  backgroundPositionX: userInputBoard[y][x] === -1 ? `${color * -22.5}px` : '30px',
+                  backgroundPositionX: `${color * -22.5}px`,
                 }}
               />
             </div>
