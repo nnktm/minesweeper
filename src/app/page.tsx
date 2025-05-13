@@ -146,60 +146,65 @@ const Home = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.board}>
-        {userInputBoard.map((row, y) =>
-          row.map((col, x) =>
-            col === 0 ? (
-              <div
-                key={`${x}-${y}`}
-                className={styles.cover}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleOnClick(e, y, x);
-                }}
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                  handleOnClick(e, y, x);
-                }}
-                style={{ backgroundColor: '#c6c6c6' }}
-              />
-            ) : col === 10 ? (
-              <div
-                key={`${x}-${y}`}
-                className={styles.cell}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleOnClick(e, y, x);
-                }}
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                  handleOnClick(e, y, x);
-                }}
-                style={{ backgroundPositionX: `${(col - 1) * -30}px` }}
-              />
-            ) : col === 11 ? (
-              <div
-                key={`${x}-${y}`}
-                className={styles.cell}
-                style={{ backgroundPositionX: '-300px' }}
-              />
-            ) : col === 21 ? (
-              <div
-                key={`${x}-${y}`}
-                className={styles.cell}
-                style={{ backgroundPositionX: '-300px', backgroundColor: '#ef0000' }}
-              />
-            ) : (
-              <div
-                key={`${x}-${y}`}
-                className={styles.cell}
-                style={{
-                  backgroundPositionX: col === -1 ? '30px' : `${(col - 1) * -30}px`,
-                }}
-              />
+      <div className={styles.game}>
+        <div className={styles.info}>
+          <div className={styles.cell} style={{ backgroundPositionX: '-330px' }} />
+        </div>
+        <div className={styles.board}>
+          {userInputBoard.map((row, y) =>
+            row.map((col, x) =>
+              col === 0 ? (
+                <div
+                  key={`${x}-${y}`}
+                  className={styles.cover}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleOnClick(e, y, x);
+                  }}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    handleOnClick(e, y, x);
+                  }}
+                  style={{ backgroundColor: '#c6c6c6' }}
+                />
+              ) : col === 10 ? (
+                <div
+                  key={`${x}-${y}`}
+                  className={styles.cell}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleOnClick(e, y, x);
+                  }}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    handleOnClick(e, y, x);
+                  }}
+                  style={{ backgroundPositionX: `${(col - 1) * -30}px` }}
+                />
+              ) : col === 11 ? (
+                <div
+                  key={`${x}-${y}`}
+                  className={styles.cell}
+                  style={{ backgroundPositionX: '-300px' }}
+                />
+              ) : col === 21 ? (
+                <div
+                  key={`${x}-${y}`}
+                  className={styles.cell}
+                  style={{ backgroundPositionX: '-300px', backgroundColor: '#ef0000' }}
+                />
+              ) : (
+                <div
+                  key={`${x}-${y}`}
+                  className={styles.cell}
+                  style={{
+                    backgroundPositionX: col === -1 ? '30px' : `${(col - 1) * -30}px`,
+                  }}
+                />
+              ),
             ),
-          ),
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
