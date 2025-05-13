@@ -43,7 +43,6 @@ function shuffleBombMap(y: number, x: number, bombMap: number[][], userInputBoar
     const cx = Math.floor(Math.random() * 9);
 
     if (cy === y && cx === x) continue;
-    if (Math.abs(cy - y) <= 1 && Math.abs(cx - x) <= 1) continue;
 
     if (newBombMap[cy][cx] === 0) {
       newBombMap[cy][cx] = 1;
@@ -59,7 +58,7 @@ const checkBomCount = (cy: number, cx: number, board: number[][]) => {
   for (const direction of DIRECTIONS) {
     const dx = direction[0];
     const dy = direction[1];
-    if (board[cy + dy] === undefined) continue;
+    if (board[cy + dy] === undefined || board[cy + dy][cx + dx] === undefined) continue;
     if (board[cy + dy][cx + dx] === 1) countBom++;
   }
   return countBom;
@@ -69,63 +68,78 @@ const Home = () => {
   const [userInputBoard, setUserInputBoard] = useState(initialBoard);
   const [bombMap, setBombMap] = useState(initialBoard);
 
-  const handleOnClick = (y: number, x: number) => {
-    if (bombMap[y][x] === 1 || bombMap[y][x] === -1) return;
+  const handleOnClick = (e: React.MouseEvent, y: number, x: number) => {
+    if (userInputBoard[y][x] === -1) return;
+    const newUserInput = structuredClone(userInputBoard);
+    if (e.button === 2) {
+      if (newUserInput[y][x] === 10) {
+        newUserInput[y][x] = 0;
+      } else {
+        newUserInput[y][x] = 10;
+      }
+      setUserInputBoard(newUserInput);
+      return;
+    }
 
+    if (bombMap[y][x] === 1) {
+      for (let cy = 0; cy < 9; cy++) {
+        for (let cx = 0; cx < 9; cx++) {
+          if (bombMap[cy][cx] === 1) {
+            newUserInput[cy][cx] = 11;
+          }
+        }
+      }
+      newUserInput[y][x] = 21;
+      setUserInputBoard(newUserInput);
+      return;
+    }
     const newBombMap = shuffleBombMap(y, x, bombMap, userInputBoard);
     setBombMap(newBombMap);
     console.log(newBombMap);
 
-    const newUserInput = structuredClone(userInputBoard);
     if (newBombMap[y][x] === 0) {
-      const zeroCell: [number, number][] = [];
+      if (userInputBoard[y][x] === 0) {
+        const zeroCell: [number, number][] = [];
 
-      const checkCell = (cy: number, cx: number) => {
-        if (zeroCell.some(([x, y]) => x === cx && y === cy)) return;
+        const checkCell = (cy: number, cx: number) => {
+          if (zeroCell.some(([x, y]) => x === cx && y === cy)) return;
 
-        if (newBombMap[cy][cx] !== 0) return;
+          if (newBombMap[cy][cx] !== 0) return;
 
-        let hasBomb = false;
-        for (const direction of DIRECTIONS) {
-          const dx = direction[0];
-          const dy = direction[1];
-          if (newBombMap[cy + dy] === undefined || newBombMap[cy + dy][cx + dx] === undefined)
-            continue;
-          if (newBombMap[cy + dy][cx + dx] === 1) {
-            hasBomb = true;
-            break;
-          }
-        }
-
-        if (!hasBomb) {
-          zeroCell.push([cx, cy]);
+          let hasBomb = false;
           for (const direction of DIRECTIONS) {
             const dx = direction[0];
             const dy = direction[1];
             if (newBombMap[cy + dy] === undefined || newBombMap[cy + dy][cx + dx] === undefined)
               continue;
-            if (newBombMap[cy + dy][cx + dx] === 0) {
-              checkCell(cy + dy, cx + dx);
+            if (newBombMap[cy + dy][cx + dx] === 1) {
+              hasBomb = true;
+              newUserInput[cy][cx] = checkBomCount(cy, cx, newBombMap);
+              break;
             }
           }
-        }
-      };
 
-      checkCell(y, x);
-
-      for (const [x, y] of zeroCell) {
-        newUserInput[y][x] = -1;
-      }
-    }
-    if (userInputBoard.flat().filter((num) => num === -1).length !== 0) {
-      for (let cy = 0; cy < 9; cy++) {
-        for (let cx = 0; cx < 9; cx++) {
-          if (userInputBoard[cy][cx] === -1) {
-            newUserInput[cy][cx] = checkBomCount(cy, cx, bombMap);
+          if (!hasBomb) {
+            zeroCell.push([cx, cy]);
+            for (const direction of DIRECTIONS) {
+              const dx = direction[0];
+              const dy = direction[1];
+              if (newBombMap[cy + dy] === undefined || newBombMap[cy + dy][cx + dx] === undefined)
+                continue;
+              if (newBombMap[cy + dy][cx + dx] === 0) {
+                checkCell(cy + dy, cx + dx);
+              }
+            }
           }
+        };
+
+        checkCell(y, x);
+
+        for (const [x, y] of zeroCell) {
+          newUserInput[y][x] = -1;
         }
+        setUserInputBoard(newUserInput);
       }
-      setUserInputBoard(newUserInput);
     }
     console.log(newUserInput);
   };
@@ -134,16 +148,57 @@ const Home = () => {
     <div className={styles.container}>
       <div className={styles.board}>
         {userInputBoard.map((row, y) =>
-          row.map((color, x) => (
-            <div key={`${x}-${y}`} className={styles.cell} onClick={() => handleOnClick(y, x)}>
+          row.map((col, x) =>
+            col === 0 ? (
               <div
-                className={styles.stone}
+                key={`${x}-${y}`}
+                className={styles.cover}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleOnClick(e, y, x);
+                }}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  handleOnClick(e, y, x);
+                }}
+                style={{ backgroundColor: '#c6c6c6' }}
+              />
+            ) : col === 10 ? (
+              <div
+                key={`${x}-${y}`}
+                className={styles.cell}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleOnClick(e, y, x);
+                }}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  handleOnClick(e, y, x);
+                }}
+                style={{ backgroundPositionX: `${(col - 1) * -30}px` }}
+              />
+            ) : col === 11 ? (
+              <div
+                key={`${x}-${y}`}
+                className={styles.cell}
+                style={{ backgroundPositionX: '-300px' }}
+              />
+            ) : col === 21 ? (
+              <div
+                key={`${x}-${y}`}
+                className={styles.cell}
+                style={{ backgroundPositionX: '-300px', backgroundColor: '#ef0000' }}
+              />
+            ) : (
+              <div
+                key={`${x}-${y}`}
+                className={styles.cell}
                 style={{
-                  backgroundPositionX: `${color * -22.5}px`,
+                  backgroundPositionX: col === -1 ? '30px' : `${(col - 1) * -30}px`,
                 }}
               />
-            </div>
-          )),
+            ),
+          ),
         )}
       </div>
     </div>
