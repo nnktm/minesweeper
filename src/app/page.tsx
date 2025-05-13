@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './page.module.css';
 
 const initialBoard = [
@@ -67,8 +67,10 @@ const checkBomCount = (cy: number, cx: number, board: number[][]) => {
 const Home = () => {
   const [userInputBoard, setUserInputBoard] = useState(initialBoard);
   const [bombMap, setBombMap] = useState(initialBoard);
+  const [timer, setTimer] = useState(0);
 
   const handleOnClick = (e: React.MouseEvent, y: number, x: number) => {
+    if (isBadEnd || isGoodEnd) return;
     if (userInputBoard[y][x] === -1) return;
     const newUserInput = structuredClone(userInputBoard);
     if (e.button === 2) {
@@ -143,12 +145,40 @@ const Home = () => {
     }
     console.log(newUserInput);
   };
+  const handleOnReset = () => {
+    setUserInputBoard(initialBoard);
+    setBombMap(initialBoard);
+    setTimer(0);
+  };
+  const isBadEnd = userInputBoard.flat().filter((num) => num === 11 || num === 21).length === 10;
+
+  const isGoodEnd = userInputBoard.flat().filter((num) => num === 0 || num === 10).length === 10;
+
+  useEffect(() => {
+    if (isBadEnd || isGoodEnd) {
+      return;
+    }
+    if (bombMap.flat().filter((num) => num === 1).length === 10) {
+      const timerId = setInterval(() => {
+        setTimer((time) => time + 1);
+      }, 1000);
+      return () => clearInterval(timerId);
+    }
+  }, [bombMap, isBadEnd, isGoodEnd]);
 
   return (
     <div className={styles.container}>
       <div className={styles.game}>
         <div className={styles.info}>
-          <div className={styles.cell} style={{ backgroundPositionX: '-330px' }} />
+          <div className={styles.bombCount}>
+            {10 - userInputBoard.flat().filter((num) => num === 10).length}
+          </div>
+          <div
+            className={styles.smile}
+            onClick={handleOnReset}
+            style={{ backgroundPositionX: isBadEnd ? '-395px' : isGoodEnd ? '-365px' : '-335px' }}
+          />
+          <div className={styles.timer}>{timer}</div>
         </div>
         <div className={styles.board}>
           {userInputBoard.map((row, y) =>
@@ -170,7 +200,7 @@ const Home = () => {
               ) : col === 10 ? (
                 <div
                   key={`${x}-${y}`}
-                  className={styles.cell}
+                  className={styles.flag}
                   onClick={(e) => {
                     e.preventDefault();
                     handleOnClick(e, y, x);
@@ -179,7 +209,9 @@ const Home = () => {
                     e.preventDefault();
                     handleOnClick(e, y, x);
                   }}
-                  style={{ backgroundPositionX: `${(col - 1) * -30}px` }}
+                  style={{
+                    backgroundPositionX: `-200px `,
+                  }}
                 />
               ) : col === 11 ? (
                 <div
