@@ -59,6 +59,10 @@ const checkBomCount = (cy: number, cx: number, board: number[][]) => {
 const Home = () => {
   const [customBoard, setCustomBoard] = useState([10, 10, 15]);
   const handleOnSet = () => {
+    if (customBoard[0] < 1 || customBoard[1] < 1 || customBoard[2] < 1) {
+      alert('幅、高さ、爆弾数は1以上にしてください');
+      return;
+    }
     const initialBoard: number[][] = Array.from({ length: customBoard[1] }, () =>
       Array.from({ length: customBoard[0] }, () => 0),
     );
@@ -186,6 +190,7 @@ const Home = () => {
             </p>
             <input
               type="number"
+              min="1"
               value={customBoard[0]}
               onChange={(e) =>
                 setCustomBoard([Number(e.target.value), customBoard[1], customBoard[2]])
@@ -199,6 +204,7 @@ const Home = () => {
             </p>
             <input
               type="number"
+              min="1"
               value={customBoard[1]}
               onChange={(e) =>
                 setCustomBoard([customBoard[0], Number(e.target.value), customBoard[2]])
@@ -211,6 +217,7 @@ const Home = () => {
               </p>
               <input
                 type="number"
+                min="1"
                 value={customBoard[2]}
                 onChange={(e) =>
                   setCustomBoard([customBoard[0], customBoard[1], Number(e.target.value)])
