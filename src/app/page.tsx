@@ -3,17 +3,9 @@
 import { useEffect, useState } from 'react';
 import styles from './page.module.css';
 
-const initialBoard = [
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-];
+const initialBoard: number[][] = Array.from({ length: 9 }, () =>
+  Array.from({ length: 9 }, () => 0),
+);
 
 const DIRECTIONS = [
   [0, -1],
@@ -55,9 +47,7 @@ function shuffleBombMap(y: number, x: number, bombMap: number[][], userInputBoar
 
 const checkBomCount = (cy: number, cx: number, board: number[][]) => {
   let countBom = 0;
-  for (const direction of DIRECTIONS) {
-    const dx = direction[0];
-    const dy = direction[1];
+  for (const [dx, dy] of DIRECTIONS) {
     if (board[cy + dy] === undefined || board[cy + dy][cx + dx] === undefined) continue;
     if (board[cy + dy][cx + dx] === 1) countBom++;
   }
@@ -111,9 +101,7 @@ const Home = () => {
           if (newBombMap[cy][cx] !== 0) return;
 
           let hasBomb = false;
-          for (const direction of DIRECTIONS) {
-            const dx = direction[0];
-            const dy = direction[1];
+          for (const [dx, dy] of DIRECTIONS) {
             if (newBombMap[cy + dy] === undefined || newBombMap[cy + dy][cx + dx] === undefined)
               continue;
             if (newBombMap[cy + dy][cx + dx] === 1) {
@@ -125,9 +113,7 @@ const Home = () => {
 
           if (!hasBomb) {
             zeroCell.push([cx, cy]);
-            for (const direction of DIRECTIONS) {
-              const dx = direction[0];
-              const dy = direction[1];
+            for (const [dx, dy] of DIRECTIONS) {
               if (newBombMap[cy + dy] === undefined || newBombMap[cy + dy][cx + dx] === undefined)
                 continue;
               if (newBombMap[cy + dy][cx + dx] === 0) {
@@ -174,6 +160,7 @@ const Home = () => {
         <a href="/">初級</a>
         <a href="/page2">中級</a>
         <a href="/page3">上級</a>
+        <a href="/custom">カスタム</a>
       </div>
       <div className={styles.game}>
         <div className={styles.info}>

@@ -1,19 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import styles from './page.module.css';
-
-const initialBoard = [
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-];
+import styles from '../page4.module.css';
 
 const DIRECTIONS = [
   [0, -1],
@@ -26,7 +14,13 @@ const DIRECTIONS = [
   [-1, -1],
 ];
 
-function shuffleBombMap(y: number, x: number, bombMap: number[][], userInputBoard: number[][]) {
+function shuffleBombMap(
+  y: number,
+  x: number,
+  bombMap: number[][],
+  userInputBoard: number[][],
+  customBoard: number[],
+) {
   if (userInputBoard.flat().filter((num) => num === -1).length !== 0) {
     return bombMap;
   }
@@ -36,11 +30,11 @@ function shuffleBombMap(y: number, x: number, bombMap: number[][], userInputBoar
 
   const newBombMap = structuredClone(bombMap);
   let bombCount = 0;
-  const maxBombs = 10;
+  const maxBombs = customBoard[2];
 
   while (bombCount < maxBombs) {
-    const cy = Math.floor(Math.random() * 9);
-    const cx = Math.floor(Math.random() * 9);
+    const cy = Math.floor(Math.random() * customBoard[1]);
+    const cx = Math.floor(Math.random() * customBoard[0]);
 
     if (cy === y && cx === x) continue;
 
@@ -55,9 +49,7 @@ function shuffleBombMap(y: number, x: number, bombMap: number[][], userInputBoar
 
 const checkBomCount = (cy: number, cx: number, board: number[][]) => {
   let countBom = 0;
-  for (const direction of DIRECTIONS) {
-    const dx = direction[0];
-    const dy = direction[1];
+  for (const [dx, dy] of DIRECTIONS) {
     if (board[cy + dy] === undefined || board[cy + dy][cx + dx] === undefined) continue;
     if (board[cy + dy][cx + dx] === 1) countBom++;
   }
@@ -65,9 +57,26 @@ const checkBomCount = (cy: number, cx: number, board: number[][]) => {
 };
 
 const Home = () => {
-  const [userInputBoard, setUserInputBoard] = useState(initialBoard);
-  const [bombMap, setBombMap] = useState(initialBoard);
+  const [customBoard, setCustomBoard] = useState([10, 10, 15]);
+  const handleOnSet = () => {
+    const initialBoard: number[][] = Array.from({ length: customBoard[1] }, () =>
+      Array.from({ length: customBoard[0] }, () => 0),
+    );
+    setUserInputBoard(initialBoard);
+    setBombMap(initialBoard);
+  };
+  const [userInputBoard, setUserInputBoard] = useState<number[][]>([]);
+  const [bombMap, setBombMap] = useState<number[][]>([]);
   const [timer, setTimer] = useState(0);
+
+  const handleOnReset = () => {
+    const initialBoard: number[][] = Array.from({ length: customBoard[1] }, () =>
+      Array.from({ length: customBoard[0] }, () => 0),
+    );
+    setUserInputBoard(initialBoard);
+    setBombMap(initialBoard);
+    setTimer(0);
+  };
 
   const handleOnClick = (e: React.MouseEvent, y: number, x: number) => {
     if (isBadEnd || isGoodEnd) return;
@@ -75,6 +84,8 @@ const Home = () => {
     const newUserInput = structuredClone(userInputBoard);
     if (e.button === 2) {
       if (newUserInput[y][x] === 10) {
+        newUserInput[y][x] = 9;
+      } else if (newUserInput[y][x] === 9) {
         newUserInput[y][x] = 0;
       } else {
         newUserInput[y][x] = 10;
@@ -84,8 +95,8 @@ const Home = () => {
     }
 
     if (bombMap[y][x] === 1) {
-      for (let cy = 0; cy < 9; cy++) {
-        for (let cx = 0; cx < 9; cx++) {
+      for (let cy = 0; cy < customBoard[1]; cy++) {
+        for (let cx = 0; cx < customBoard[0]; cx++) {
           if (bombMap[cy][cx] === 1) {
             newUserInput[cy][cx] = 11;
           }
@@ -95,7 +106,7 @@ const Home = () => {
       setUserInputBoard(newUserInput);
       return;
     }
-    const newBombMap = shuffleBombMap(y, x, bombMap, userInputBoard);
+    const newBombMap = shuffleBombMap(y, x, bombMap, userInputBoard, customBoard);
     setBombMap(newBombMap);
     console.log(newBombMap);
 
@@ -109,9 +120,7 @@ const Home = () => {
           if (newBombMap[cy][cx] !== 0) return;
 
           let hasBomb = false;
-          for (const direction of DIRECTIONS) {
-            const dx = direction[0];
-            const dy = direction[1];
+          for (const [dx, dy] of DIRECTIONS) {
             if (newBombMap[cy + dy] === undefined || newBombMap[cy + dy][cx + dx] === undefined)
               continue;
             if (newBombMap[cy + dy][cx + dx] === 1) {
@@ -123,9 +132,7 @@ const Home = () => {
 
           if (!hasBomb) {
             zeroCell.push([cx, cy]);
-            for (const direction of DIRECTIONS) {
-              const dx = direction[0];
-              const dy = direction[1];
+            for (const [dx, dy] of DIRECTIONS) {
               if (newBombMap[cy + dy] === undefined || newBombMap[cy + dy][cx + dx] === undefined)
                 continue;
               if (newBombMap[cy + dy][cx + dx] === 0) {
@@ -145,33 +152,80 @@ const Home = () => {
     }
     console.log(newUserInput);
   };
-  const handleOnReset = () => {
-    setUserInputBoard(initialBoard);
-    setBombMap(initialBoard);
-    setTimer(0);
-  };
-  const isBadEnd = userInputBoard.flat().filter((num) => num === 11 || num === 21).length === 10;
+  const isBadEnd =
+    userInputBoard.flat().filter((num) => num === 11 || num === 21).length === customBoard[2];
 
-  const isGoodEnd = userInputBoard.flat().filter((num) => num === 0 || num === 10).length === 10;
+  const isGoodEnd =
+    userInputBoard.flat().filter((num) => num === 0 || num === 10).length === customBoard[2];
 
   useEffect(() => {
     if (isBadEnd || isGoodEnd) {
       return;
     }
-    if (bombMap.flat().filter((num) => num === 1).length === 10) {
+    if (bombMap.flat().filter((num) => num === 1).length === customBoard[2]) {
       const timerId = setInterval(() => {
         setTimer((time) => time + 1);
       }, 1000);
       return () => clearInterval(timerId);
     }
-  }, [bombMap, isBadEnd, isGoodEnd]);
+  }, [bombMap, isBadEnd, isGoodEnd, customBoard]);
 
   return (
     <div className={styles.container}>
+      <div className={styles.link}>
+        <a href="/">初級</a>
+        <a href="/page2">中級</a>
+        <a href="/page3">上級</a>
+        <a href="/custom">カスタム</a>
+      </div>
+      <div className={styles.custom}>
+        <div className={styles.customBoard}>
+          <div className={styles.customBoardItem}>
+            <p>
+              <strong>幅</strong>
+            </p>
+            <input
+              type="number"
+              value={customBoard[0]}
+              onChange={(e) =>
+                setCustomBoard([Number(e.target.value), customBoard[1], customBoard[2]])
+              }
+              className={styles.textBox}
+            />
+          </div>
+          <div className={styles.customBoardItem}>
+            <p>
+              <strong>高さ</strong>
+            </p>
+            <input
+              type="number"
+              value={customBoard[1]}
+              onChange={(e) =>
+                setCustomBoard([customBoard[0], Number(e.target.value), customBoard[2]])
+              }
+              className={styles.textBox}
+            />
+            <div className={styles.customBoardItem}>
+              <p>
+                <strong>爆弾数</strong>
+              </p>
+              <input
+                type="number"
+                value={customBoard[2]}
+                onChange={(e) =>
+                  setCustomBoard([customBoard[0], customBoard[1], Number(e.target.value)])
+                }
+                className={styles.textBox}
+              />
+            </div>
+            <button onClick={handleOnSet}>更新</button>
+          </div>
+        </div>
+      </div>
       <div className={styles.game}>
         <div className={styles.info}>
           <div className={styles.bombCount}>
-            {10 - userInputBoard.flat().filter((num) => num === 10).length}
+            {customBoard[2] - userInputBoard.flat().filter((num) => num === 10).length}
           </div>
           <div
             className={styles.smile}
@@ -180,7 +234,13 @@ const Home = () => {
           />
           <div className={styles.timer}>{timer}</div>
         </div>
-        <div className={styles.board}>
+        <div
+          className={styles.board}
+          style={{
+            gridTemplateRows: `repeat(${customBoard[1]}, 30px)`,
+            gridTemplateColumns: `repeat(${customBoard[0]}, 30px)`,
+          }}
+        >
           {userInputBoard.map((row, y) =>
             row.map((col, x) =>
               col === 0 ? (
@@ -197,7 +257,7 @@ const Home = () => {
                   }}
                   style={{ backgroundColor: '#c6c6c6' }}
                 />
-              ) : col === 10 ? (
+              ) : col === 10 || col === 9 ? (
                 <div
                   key={`${x}-${y}`}
                   className={styles.flag}
@@ -210,7 +270,7 @@ const Home = () => {
                     handleOnClick(e, y, x);
                   }}
                   style={{
-                    backgroundPositionX: `-200px `,
+                    backgroundPositionX: col === 10 ? `-178px ` : `-158px`,
                   }}
                 />
               ) : col === 11 ? (
