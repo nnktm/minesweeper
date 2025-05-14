@@ -1,0 +1,91 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  min-height: 100vh;
+  padding: 0 0.5rem;
+}
+
+.game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #c6c6c6;
+  border-top: solid 5px #fff;
+  border-right: solid 5px #808080;
+  border-bottom: solid 5px #808080;
+  border-left: solid 5px #fff;
+  box-shadow: 0 0 10px 0 #c6c6c6;
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 279px;
+  height: 60px;
+  margin: 10px 15px 0;
+  background-color: #c6c6c6;
+  border-top: solid 5px #808080;
+  border-right: solid 5px #fff;
+  border-bottom: solid 5px #fff;
+  border-left: solid 5px #808080;
+}
+
+.smile {
+  width: 40px;
+  aspect-ratio: 1;
+  background: url('~/src/assets/images/image.png') no-repeat;
+  background-color: #c6c6c6;
+  background-size: cover;
+  border-top: solid 5px #fff;
+  border-right: solid 5px #808080;
+  border-bottom: solid 5px #808080;
+  border-left: solid 5px #fff;
+}
+
+.board {
+  display: grid;
+  grid-template-rows: repeat(16, 30px);
+  grid-template-columns: repeat(30, 30px);
+  margin: 10px 15px 15px;
+  background-color: #c6c6c6;
+  border-top: solid 5px #808080;
+  border-right: solid 5px #fff;
+  border-bottom: solid 5px #fff;
+  border-left: solid 5px #808080;
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  aspect-ratio: 1;
+  background: url('~/src/assets/images/image.png') no-repeat;
+  border: solid 1px #808080;
+}
+
+.cover {
+  width: 30px;
+  aspect-ratio: 1;
+  background-color: #c6c6c6;
+  border-top: solid 4px #fff;
+  border-right: solid 4px #808080;
+  border-bottom: solid 4px #808080;
+  border-left: solid 4px #fff;
+}
+
+.flag {
+  width: 30px;
+  aspect-ratio: 1;
+  background: url('~/src/assets/images/image.png') no-repeat;
+  background-size: cover;
+  border-top: solid 4px #fff;
+  border-right: solid 4px #808080;
+  border-bottom: solid 4px #808080;
+  border-left: solid 4px #fff;
+}

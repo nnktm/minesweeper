@@ -1,18 +1,25 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import styles from './page.module.css';
+import styles from '../page3.module.css';
 
 const initialBoard = [
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ];
 
 const DIRECTIONS = [
@@ -30,17 +37,17 @@ function shuffleBombMap(y: number, x: number, bombMap: number[][], userInputBoar
   if (userInputBoard.flat().filter((num) => num === -1).length !== 0) {
     return bombMap;
   }
-  if (bombMap.flat().filter((num) => num === 1).length === 10) {
+  if (bombMap.flat().filter((num) => num === 1).length === 99) {
     return bombMap;
   }
 
   const newBombMap = structuredClone(bombMap);
   let bombCount = 0;
-  const maxBombs = 10;
+  const maxBombs = 99;
 
   while (bombCount < maxBombs) {
-    const cy = Math.floor(Math.random() * 9);
-    const cx = Math.floor(Math.random() * 9);
+    const cy = Math.floor(Math.random() * 16);
+    const cx = Math.floor(Math.random() * 30);
 
     if (cy === y && cx === x) continue;
 
@@ -84,8 +91,8 @@ const Home = () => {
     }
 
     if (bombMap[y][x] === 1) {
-      for (let cy = 0; cy < 9; cy++) {
-        for (let cx = 0; cx < 9; cx++) {
+      for (let cy = 0; cy < 16; cy++) {
+        for (let cx = 0; cx < 30; cx++) {
           if (bombMap[cy][cx] === 1) {
             newUserInput[cy][cx] = 11;
           }
@@ -150,9 +157,9 @@ const Home = () => {
     setBombMap(initialBoard);
     setTimer(0);
   };
-  const isBadEnd = userInputBoard.flat().filter((num) => num === 11 || num === 21).length === 10;
+  const isBadEnd = userInputBoard.flat().filter((num) => num === 11 || num === 21).length === 99;
 
-  const isGoodEnd = userInputBoard.flat().filter((num) => num === 0 || num === 10).length === 10;
+  const isGoodEnd = userInputBoard.flat().filter((num) => num === 0 || num === 10).length === 99;
 
   useEffect(() => {
     if (isBadEnd || isGoodEnd) {
@@ -166,6 +173,8 @@ const Home = () => {
     }
   }, [bombMap, isBadEnd, isGoodEnd]);
 
+  console.log(bombMap.flat().filter((num) => num === 1).length);
+
   return (
     <div className={styles.container}>
       <a href="/">初級</a>
@@ -174,7 +183,7 @@ const Home = () => {
       <div className={styles.game}>
         <div className={styles.info}>
           <div className={styles.bombCount}>
-            {10 - userInputBoard.flat().filter((num) => num === 10).length}
+            {99 - userInputBoard.flat().filter((num) => num === 10).length}
           </div>
           <div
             className={styles.smile}
