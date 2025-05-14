@@ -8,6 +8,18 @@
   padding: 0 0.5rem;
 }
 
+.link {
+  display: flex;
+  margin-right: auto;
+  margin-left: 10px;
+}
+
+.link a {
+  margin-right: 20px;
+  margin-bottom: 10px;
+  font-size: large;
+}
+
 .game {
   display: flex;
   flex-direction: column;
@@ -83,7 +95,7 @@
   width: 30px;
   aspect-ratio: 1;
   background: url('~/src/assets/images/image.png') no-repeat;
-  background-size: cover;
+  background-size: 280px 20px;
   border-top: solid 4px #fff;
   border-right: solid 4px #808080;
   border-bottom: solid 4px #808080;

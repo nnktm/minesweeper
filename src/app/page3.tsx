@@ -75,8 +75,6 @@ const Home = () => {
     const newUserInput = structuredClone(userInputBoard);
     if (e.button === 2) {
       if (newUserInput[y][x] === 10) {
-        newUserInput[y][x] = 9;
-      } else if (newUserInput[y][x] === 9) {
         newUserInput[y][x] = 0;
       } else {
         newUserInput[y][x] = 10;
@@ -170,11 +168,6 @@ const Home = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.link}>
-        <a href="/">初級</a>
-        <a href="/page2">中級</a>
-        <a href="/page3">上級</a>
-      </div>
       <div className={styles.game}>
         <div className={styles.info}>
           <div className={styles.bombCount}>
@@ -204,7 +197,7 @@ const Home = () => {
                   }}
                   style={{ backgroundColor: '#c6c6c6' }}
                 />
-              ) : col === 10 || col === 9 ? (
+              ) : col === 10 ? (
                 <div
                   key={`${x}-${y}`}
                   className={styles.flag}
@@ -217,7 +210,7 @@ const Home = () => {
                     handleOnClick(e, y, x);
                   }}
                   style={{
-                    backgroundPositionX: col === 10 ? `-178px ` : `-158px`,
+                    backgroundPositionX: `-200px `,
                   }}
                 />
               ) : col === 11 ? (
