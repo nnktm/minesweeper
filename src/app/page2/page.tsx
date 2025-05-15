@@ -154,6 +154,10 @@ const Home = () => {
     }
   }, [bombMap, isBadEnd, isGoodEnd]);
 
+  const restBombCount =
+    bombMap.flat().filter((num) => num === 1).length -
+    userInputBoard.flat().filter((num) => num === 10).length;
+
   return (
     <div className={styles.container}>
       <div className={styles.link}>
@@ -165,14 +169,62 @@ const Home = () => {
       <div className={styles.game}>
         <div className={styles.info}>
           <div className={styles.bombCount}>
-            {40 - userInputBoard.flat().filter((num) => num === 10).length}
+            <div
+              className={styles.timerItem}
+              style={
+                restBombCount / 100 > 0
+                  ? { backgroundPositionX: `${Math.floor(restBombCount / 100) * -27.5}px` }
+                  : { backgroundPositionX: '0px' }
+              }
+            />
+            <div
+              className={styles.timerItem}
+              style={
+                restBombCount / 10 > 0
+                  ? { backgroundPositionX: `${Math.floor((restBombCount % 100) / 10) * -27.5}px` }
+                  : { backgroundPositionX: '0px' }
+              }
+            />
+            <div
+              className={styles.timerItem}
+              style={
+                restBombCount % 10 > 0
+                  ? { backgroundPositionX: `${(restBombCount % 10) * -27.5}px` }
+                  : { backgroundPositionX: '0px' }
+              }
+            />
           </div>
           <div
             className={styles.smile}
             onClick={handleOnReset}
             style={{ backgroundPositionX: isBadEnd ? '-395px' : isGoodEnd ? '-365px' : '-335px' }}
           />
-          <div className={styles.timer}>{timer}</div>
+          <div className={styles.timer}>
+            <div
+              className={styles.timerItem}
+              style={
+                timer / 100 > 0
+                  ? { backgroundPositionX: `${Math.floor(timer / 100) * -27.5}px` }
+                  : { backgroundPositionX: '0px' }
+              }
+            />
+            <div
+              className={styles.timerItem}
+              style={
+                timer / 10 > 0
+                  ? { backgroundPositionX: `${Math.floor((timer % 100) / 10) * -27.5}px` }
+                  : { backgroundPositionX: '0px' }
+              }
+            />
+            <div
+              className={styles.timerItem}
+              style={
+                timer % 10 > 0
+                  ? { backgroundPositionX: `${(timer % 10) * -27.5}px` }
+                  : { backgroundPositionX: '0px' }
+              }
+            />
+          </div>
         </div>
         <div className={styles.board}>
           {userInputBoard.map((row, y) =>

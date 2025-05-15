@@ -8,18 +8,26 @@
   padding: 0 0.5rem;
 }
 
-.custom {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-}
-
 .customBoard {
   display: flex;
   flex-direction: row;
-  align-items: center;
-  justify-content: center;
+}
+
+.customBoardItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.textBox {
+  width: 40px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.setButton {
+  width: 60px;
+  height: 30px;
+  margin: 10px;
 }
 
 .link {
@@ -71,6 +79,44 @@
   border-right: solid 5px #808080;
   border-bottom: solid 5px #808080;
   border-left: solid 5px #fff;
+}
+
+.timer {
+  display: flex;
+  flex-direction: row;
+  margin: 5px;
+  margin-left: auto;
+  border-top: solid 2px #808080;
+  border-right: solid 2px #fff;
+  border-bottom: solid 2px #fff;
+  border-left: solid 2px #808080;
+}
+
+.timerItem {
+  width: 25px;
+  height: 40px;
+  background: url('~/src/assets/images/timer.png') no-repeat;
+  background-color: #c6c6c6;
+  background-size: 275px 40px;
+}
+
+.bombCount {
+  display: flex;
+  flex-direction: row;
+  margin: 5px;
+  margin-right: auto;
+  border-top: solid 2px #808080;
+  border-right: solid 2px #fff;
+  border-bottom: solid 2px #fff;
+  border-left: solid 2px #808080;
+}
+
+.bombCountItem {
+  width: 25px;
+  height: 40px;
+  background: url('~/src/assets/images/timer.png') no-repeat;
+  background-color: #c6c6c6;
+  background-size: 275px 50px;
 }
 
 .board {
