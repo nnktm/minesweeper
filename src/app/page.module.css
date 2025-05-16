@@ -80,6 +80,13 @@
   border-left: solid 5px #fff;
 }
 
+.smile:active {
+  border-top: solid 5px #808080;
+  border-right: solid 5px #fff;
+  border-bottom: solid 5px #fff;
+  border-left: solid 5px #808080;
+}
+
 .timer {
   display: flex;
   flex-direction: row;
