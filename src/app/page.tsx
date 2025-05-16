@@ -78,8 +78,12 @@ const Home = () => {
     setBombMap(initialBoard);
     setTimer(0);
   };
-  const [userInputBoard, setUserInputBoard] = useState<number[][]>([]);
-  const [bombMap, setBombMap] = useState<number[][]>([]);
+  const [userInputBoard, setUserInputBoard] = useState<number[][]>(
+    Array.from({ length: 9 }, () => Array.from({ length: 9 }, () => 0)),
+  );
+  const [bombMap, setBombMap] = useState<number[][]>(
+    Array.from({ length: 9 }, () => Array.from({ length: 9 }, () => 0)),
+  );
   const [timer, setTimer] = useState(0);
 
   const handleOnSelect = (value: string) => {
@@ -98,7 +102,7 @@ const Home = () => {
       setBombMap(newBoard);
     } else if (value === '上級') {
       setCustomBoard({ width: 30, height: 16, bombCount: 99 });
-      const newBoard = Array.from({ length: 30 }, () => Array.from({ length: 16 }, () => 0));
+      const newBoard = Array.from({ length: 16 }, () => Array.from({ length: 30 }, () => 0));
       setUserInputBoard(newBoard);
       setBombMap(newBoard);
     } else if (value === 'カスタム') {
@@ -229,9 +233,10 @@ const Home = () => {
                 type="number"
                 min="1"
                 value={customBoard.width}
-                onChange={(e) =>
-                  setCustomBoard((curr) => ({ ...curr, width: Number(e.target.value) }))
-                }
+                onChange={(e) => {
+                  setCustomBoard((curr) => ({ ...curr, width: Number(e.target.value) }));
+                  handleOnSet();
+                }}
                 className={styles.textBox}
               />
             </div>
@@ -243,9 +248,11 @@ const Home = () => {
                 type="number"
                 min="1"
                 value={customBoard.height}
-                onChange={(e) =>
-                  setCustomBoard((curr) => ({ ...curr, height: Number(e.target.value) }))
-                }
+                onChange={(e) => {
+                  setCustomBoard((curr) => ({ ...curr, height: Number(e.target.value) }));
+                  console.log(customBoard.height);
+                  handleOnSet();
+                }}
                 className={styles.textBox}
               />
             </div>
@@ -257,9 +264,10 @@ const Home = () => {
                 type="number"
                 min="1"
                 value={customBoard.bombCount}
-                onChange={(e) =>
-                  setCustomBoard((curr) => ({ ...curr, bombCount: Number(e.target.value) }))
-                }
+                onChange={(e) => {
+                  setCustomBoard((curr) => ({ ...curr, bombCount: Number(e.target.value) }));
+                  handleOnSet();
+                }}
                 className={styles.textBox}
               />
             </div>
