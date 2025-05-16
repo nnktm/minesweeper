@@ -1,11 +1,10 @@
 'use client';
 
+import DropdownList from '@/components/DropdownList';
 import { useEffect, useState } from 'react';
 import styles from './page.module.css';
 
-const initialBoard: number[][] = Array.from({ length: 9 }, () =>
-  Array.from({ length: 9 }, () => 0),
-);
+const options = [{ value: '初級' }, { value: '中級' }, { value: '上級' }, { value: 'カスタム' }];
 
 const DIRECTIONS = [
   [0, -1],
@@ -18,21 +17,31 @@ const DIRECTIONS = [
   [-1, -1],
 ];
 
-function shuffleBombMap(y: number, x: number, bombMap: number[][], userInputBoard: number[][]) {
+function shuffleBombMap(
+  y: number,
+  x: number,
+  bombMap: number[][],
+  userInputBoard: number[][],
+  customBoard: {
+    width: number;
+    height: number;
+    bombCount: number;
+  },
+) {
+  if (bombMap.flat().filter((num) => num === 1).length === customBoard.bombCount) {
+    return bombMap;
+  }
   if (userInputBoard.flat().filter((num) => num === -1).length !== 0) {
     return bombMap;
   }
-  if (bombMap.flat().filter((num) => num === 1).length === 10) {
-    return bombMap;
-  }
+
+  let bombCount = 0;
+  const maxBombs = customBoard.bombCount;
 
   const newBombMap = structuredClone(bombMap);
-  let bombCount = 0;
-  const maxBombs = 10;
-
   while (bombCount < maxBombs) {
-    const cy = Math.floor(Math.random() * 9);
-    const cx = Math.floor(Math.random() * 9);
+    const cy = Math.floor(Math.random() * customBoard.height);
+    const cx = Math.floor(Math.random() * customBoard.width);
 
     if (cy === y && cx === x) continue;
 
@@ -55,9 +64,46 @@ const checkBomCount = (cy: number, cx: number, board: number[][]) => {
 };
 
 const Home = () => {
-  const [userInputBoard, setUserInputBoard] = useState(initialBoard);
-  const [bombMap, setBombMap] = useState(initialBoard);
+  const [selectedOption, setSelectedOption] = useState<string>('初級');
+  const [customBoard, setCustomBoard] = useState({ width: 0, height: 0, bombCount: 0 });
+  const handleOnSet = () => {
+    if (customBoard.width < 1 || customBoard.height < 1 || customBoard.bombCount < 1) {
+      alert('幅、高さ、爆弾数は1以上にしてください');
+      return;
+    }
+    const initialBoard: number[][] = Array.from({ length: customBoard.height }, () =>
+      Array.from({ length: customBoard.width }, () => 0),
+    );
+    setUserInputBoard(initialBoard);
+    setBombMap(initialBoard);
+    setTimer(0);
+  };
+  const [userInputBoard, setUserInputBoard] = useState<number[][]>([]);
+  const [bombMap, setBombMap] = useState<number[][]>([]);
   const [timer, setTimer] = useState(0);
+
+  const handleOnSelect = (value: string) => {
+    setSelectedOption(value);
+    console.log(value);
+    if (value === '初級') {
+      setCustomBoard({ width: 9, height: 9, bombCount: 10 });
+    } else if (value === '中級') {
+      setCustomBoard({ width: 16, height: 16, bombCount: 40 });
+    } else if (value === '上級') {
+      setCustomBoard({ width: 30, height: 16, bombCount: 99 });
+    } else if (value === 'カスタム') {
+      setCustomBoard({ width: 10, height: 10, bombCount: 15 });
+    }
+  };
+
+  const handleOnReset = () => {
+    const initialBoard: number[][] = Array.from({ length: customBoard.height }, () =>
+      Array.from({ length: customBoard.width }, () => 0),
+    );
+    setUserInputBoard(initialBoard);
+    setBombMap(initialBoard);
+    setTimer(0);
+  };
 
   const handleOnClick = (e: React.MouseEvent, y: number, x: number) => {
     if (isBadEnd || isGoodEnd) return;
@@ -76,8 +122,8 @@ const Home = () => {
     }
 
     if (bombMap[y][x] === 1) {
-      for (let cy = 0; cy < 9; cy++) {
-        for (let cx = 0; cx < 9; cx++) {
+      for (let cy = 0; cy < customBoard.height; cy++) {
+        for (let cx = 0; cx < customBoard.width; cx++) {
           if (bombMap[cy][cx] === 1) {
             newUserInput[cy][cx] = 11;
           }
@@ -87,10 +133,9 @@ const Home = () => {
       setUserInputBoard(newUserInput);
       return;
     }
-    const newBombMap = shuffleBombMap(y, x, bombMap, userInputBoard);
+    const newBombMap = shuffleBombMap(y, x, bombMap, userInputBoard, customBoard);
     setBombMap(newBombMap);
     console.log(newBombMap);
-
     if (newBombMap[y][x] === 0) {
       if (userInputBoard[y][x] === 0) {
         const zeroCell: [number, number][] = [];
@@ -133,39 +178,82 @@ const Home = () => {
     }
     console.log(newUserInput);
   };
-  const handleOnReset = () => {
-    setUserInputBoard(initialBoard);
-    setBombMap(initialBoard);
-    setTimer(0);
-  };
-  const isBadEnd = userInputBoard.flat().filter((num) => num === 11 || num === 21).length === 10;
+  const isBadEnd =
+    userInputBoard.flat().filter((num) => num === 11 || num === 21).length ===
+    customBoard.bombCount;
 
-  const isGoodEnd = userInputBoard.flat().filter((num) => num === 0 || num === 10).length === 10;
+  const isGoodEnd =
+    userInputBoard.flat().filter((num) => num === 0 || num === 10).length === customBoard.bombCount;
 
   useEffect(() => {
     if (isBadEnd || isGoodEnd) {
       return;
     }
-    if (bombMap.flat().filter((num) => num === 1).length === 10) {
+    if (bombMap.flat().filter((num) => num === 1).length === customBoard.bombCount) {
       const timerId = setInterval(() => {
         setTimer((time) => time + 1);
       }, 1000);
       return () => clearInterval(timerId);
     }
-  }, [bombMap, isBadEnd, isGoodEnd]);
+  }, [bombMap, isBadEnd, isGoodEnd, customBoard]);
 
   const restBombCount =
-    bombMap.flat().filter((num) => num === 1).length -
-    userInputBoard.flat().filter((num) => num === 10).length;
+    customBoard.bombCount - userInputBoard.flat().filter((num) => num === 10).length;
 
   return (
     <div className={styles.container}>
-      <div className={styles.link}>
-        <a href="/">初級</a>
-        <a href="/page2">中級</a>
-        <a href="/page3">上級</a>
-        <a href="/custom">カスタム</a>
+      <div className={styles.level}>
+        <DropdownList options={options} onChange={handleOnSelect} value={selectedOption} />
       </div>
+      {selectedOption === 'カスタム' && (
+        <div className={styles.customBoard}>
+          <div className={styles.customBoardItem}>
+            <label>
+              <strong>幅</strong>
+            </label>
+            <input
+              type="number"
+              min="1"
+              value={customBoard.width}
+              onChange={(e) =>
+                setCustomBoard((curr) => ({ ...curr, width: Number(e.target.value) }))
+              }
+              className={styles.textBox}
+            />
+          </div>
+          <div className={styles.customBoardItem}>
+            <label>
+              <strong>高さ</strong>
+            </label>
+            <input
+              type="number"
+              min="1"
+              value={customBoard.height}
+              onChange={(e) =>
+                setCustomBoard((curr) => ({ ...curr, height: Number(e.target.value) }))
+              }
+              className={styles.textBox}
+            />
+          </div>
+          <div className={styles.customBoardItem}>
+            <label>
+              <strong>爆弾数</strong>
+            </label>
+            <input
+              type="number"
+              min="1"
+              value={customBoard.bombCount}
+              onChange={(e) =>
+                setCustomBoard((curr) => ({ ...curr, bombCount: Number(e.target.value) }))
+              }
+              className={styles.textBox}
+            />
+          </div>
+          <button onClick={handleOnSet} className={styles.setButton}>
+            更新
+          </button>
+        </div>
+      )}
       <div className={styles.game}>
         <div className={styles.info}>
           <div className={styles.bombCount}>
@@ -226,7 +314,13 @@ const Home = () => {
             />
           </div>
         </div>
-        <div className={styles.board}>
+        <div
+          className={styles.board}
+          style={{
+            gridTemplateRows: `repeat(${customBoard.height}, 30px)`,
+            gridTemplateColumns: `repeat(${customBoard.width}, 30px)`,
+          }}
+        >
           {userInputBoard.map((row, y) =>
             row.map((col, x) =>
               col === 0 ? (
