@@ -65,7 +65,7 @@ const checkBomCount = (cy: number, cx: number, board: number[][]) => {
 
 const Home = () => {
   const [selectedOption, setSelectedOption] = useState<string>('初級');
-  const [customBoard, setCustomBoard] = useState({ width: 0, height: 0, bombCount: 0 });
+  const [customBoard, setCustomBoard] = useState({ width: 9, height: 9, bombCount: 10 });
   const handleOnSet = () => {
     if (customBoard.width < 1 || customBoard.height < 1 || customBoard.bombCount < 1) {
       alert('幅、高さ、爆弾数は1以上にしてください');
@@ -85,14 +85,27 @@ const Home = () => {
   const handleOnSelect = (value: string) => {
     setSelectedOption(value);
     console.log(value);
+    setTimer(0);
     if (value === '初級') {
       setCustomBoard({ width: 9, height: 9, bombCount: 10 });
+      const newBoard = Array.from({ length: 9 }, () => Array.from({ length: 9 }, () => 0));
+      setUserInputBoard(newBoard);
+      setBombMap(newBoard);
     } else if (value === '中級') {
       setCustomBoard({ width: 16, height: 16, bombCount: 40 });
+      const newBoard = Array.from({ length: 16 }, () => Array.from({ length: 16 }, () => 0));
+      setUserInputBoard(newBoard);
+      setBombMap(newBoard);
     } else if (value === '上級') {
       setCustomBoard({ width: 30, height: 16, bombCount: 99 });
+      const newBoard = Array.from({ length: 30 }, () => Array.from({ length: 16 }, () => 0));
+      setUserInputBoard(newBoard);
+      setBombMap(newBoard);
     } else if (value === 'カスタム') {
       setCustomBoard({ width: 10, height: 10, bombCount: 15 });
+      const newBoard = Array.from({ length: 10 }, () => Array.from({ length: 10 }, () => 0));
+      setUserInputBoard(newBoard);
+      setBombMap(newBoard);
     }
   };
 
@@ -202,180 +215,182 @@ const Home = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.level}>
-        <DropdownList options={options} onChange={handleOnSelect} value={selectedOption} />
-      </div>
-      {selectedOption === 'カスタム' && (
-        <div className={styles.customBoard}>
-          <div className={styles.customBoardItem}>
-            <label>
-              <strong>幅</strong>
-            </label>
-            <input
-              type="number"
-              min="1"
-              value={customBoard.width}
-              onChange={(e) =>
-                setCustomBoard((curr) => ({ ...curr, width: Number(e.target.value) }))
-              }
-              className={styles.textBox}
-            />
-          </div>
-          <div className={styles.customBoardItem}>
-            <label>
-              <strong>高さ</strong>
-            </label>
-            <input
-              type="number"
-              min="1"
-              value={customBoard.height}
-              onChange={(e) =>
-                setCustomBoard((curr) => ({ ...curr, height: Number(e.target.value) }))
-              }
-              className={styles.textBox}
-            />
-          </div>
-          <div className={styles.customBoardItem}>
-            <label>
-              <strong>爆弾数</strong>
-            </label>
-            <input
-              type="number"
-              min="1"
-              value={customBoard.bombCount}
-              onChange={(e) =>
-                setCustomBoard((curr) => ({ ...curr, bombCount: Number(e.target.value) }))
-              }
-              className={styles.textBox}
-            />
-          </div>
-          <button onClick={handleOnSet} className={styles.setButton}>
-            更新
-          </button>
+      <div className={styles.gameContent}>
+        <div className={styles.level}>
+          <DropdownList options={options} onChange={handleOnSelect} value={selectedOption} />
         </div>
-      )}
-      <div className={styles.game}>
-        <div className={styles.info}>
-          <div className={styles.bombCount}>
+        {selectedOption === 'カスタム' && (
+          <div className={styles.customBoard}>
+            <div className={styles.customBoardItem}>
+              <label>
+                <strong>幅</strong>
+              </label>
+              <input
+                type="number"
+                min="1"
+                value={customBoard.width}
+                onChange={(e) =>
+                  setCustomBoard((curr) => ({ ...curr, width: Number(e.target.value) }))
+                }
+                className={styles.textBox}
+              />
+            </div>
+            <div className={styles.customBoardItem}>
+              <label>
+                <strong>高さ</strong>
+              </label>
+              <input
+                type="number"
+                min="1"
+                value={customBoard.height}
+                onChange={(e) =>
+                  setCustomBoard((curr) => ({ ...curr, height: Number(e.target.value) }))
+                }
+                className={styles.textBox}
+              />
+            </div>
+            <div className={styles.customBoardItem}>
+              <label>
+                <strong>爆弾数</strong>
+              </label>
+              <input
+                type="number"
+                min="1"
+                value={customBoard.bombCount}
+                onChange={(e) =>
+                  setCustomBoard((curr) => ({ ...curr, bombCount: Number(e.target.value) }))
+                }
+                className={styles.textBox}
+              />
+            </div>
+            <button onClick={handleOnSet} className={styles.setButton}>
+              更新
+            </button>
+          </div>
+        )}
+        <div className={styles.game}>
+          <div className={styles.info}>
+            <div className={styles.bombCount}>
+              <div
+                className={styles.timerItem}
+                style={
+                  restBombCount / 100 > 0
+                    ? { backgroundPositionX: `${Math.floor(restBombCount / 100) * -27.5}px` }
+                    : { backgroundPositionX: '0px' }
+                }
+              />
+              <div
+                className={styles.timerItem}
+                style={
+                  restBombCount / 10 > 0
+                    ? { backgroundPositionX: `${Math.floor((restBombCount % 100) / 10) * -27.5}px` }
+                    : { backgroundPositionX: '0px' }
+                }
+              />
+              <div
+                className={styles.timerItem}
+                style={
+                  restBombCount % 10 > 0
+                    ? { backgroundPositionX: `${(restBombCount % 10) * -27.5}px` }
+                    : { backgroundPositionX: '0px' }
+                }
+              />
+            </div>
             <div
-              className={styles.timerItem}
-              style={
-                restBombCount / 100 > 0
-                  ? { backgroundPositionX: `${Math.floor(restBombCount / 100) * -27.5}px` }
-                  : { backgroundPositionX: '0px' }
-              }
+              className={styles.smile}
+              onClick={handleOnReset}
+              style={{ backgroundPositionX: isBadEnd ? '-395px' : isGoodEnd ? '-365px' : '-335px' }}
             />
-            <div
-              className={styles.timerItem}
-              style={
-                restBombCount / 10 > 0
-                  ? { backgroundPositionX: `${Math.floor((restBombCount % 100) / 10) * -27.5}px` }
-                  : { backgroundPositionX: '0px' }
-              }
-            />
-            <div
-              className={styles.timerItem}
-              style={
-                restBombCount % 10 > 0
-                  ? { backgroundPositionX: `${(restBombCount % 10) * -27.5}px` }
-                  : { backgroundPositionX: '0px' }
-              }
-            />
+            <div className={styles.timer}>
+              <div
+                className={styles.timerItem}
+                style={
+                  timer / 100 > 0
+                    ? { backgroundPositionX: `${Math.floor(timer / 100) * -27.5}px` }
+                    : { backgroundPositionX: '0px' }
+                }
+              />
+              <div
+                className={styles.timerItem}
+                style={
+                  timer / 10 > 0
+                    ? { backgroundPositionX: `${Math.floor((timer % 100) / 10) * -27.5}px` }
+                    : { backgroundPositionX: '0px' }
+                }
+              />
+              <div
+                className={styles.timerItem}
+                style={
+                  timer % 10 > 0
+                    ? { backgroundPositionX: `${(timer % 10) * -27.5}px` }
+                    : { backgroundPositionX: '0px' }
+                }
+              />
+            </div>
           </div>
           <div
-            className={styles.smile}
-            onClick={handleOnReset}
-            style={{ backgroundPositionX: isBadEnd ? '-395px' : isGoodEnd ? '-365px' : '-335px' }}
-          />
-          <div className={styles.timer}>
-            <div
-              className={styles.timerItem}
-              style={
-                timer / 100 > 0
-                  ? { backgroundPositionX: `${Math.floor(timer / 100) * -27.5}px` }
-                  : { backgroundPositionX: '0px' }
-              }
-            />
-            <div
-              className={styles.timerItem}
-              style={
-                timer / 10 > 0
-                  ? { backgroundPositionX: `${Math.floor((timer % 100) / 10) * -27.5}px` }
-                  : { backgroundPositionX: '0px' }
-              }
-            />
-            <div
-              className={styles.timerItem}
-              style={
-                timer % 10 > 0
-                  ? { backgroundPositionX: `${(timer % 10) * -27.5}px` }
-                  : { backgroundPositionX: '0px' }
-              }
-            />
-          </div>
-        </div>
-        <div
-          className={styles.board}
-          style={{
-            gridTemplateRows: `repeat(${customBoard.height}, 30px)`,
-            gridTemplateColumns: `repeat(${customBoard.width}, 30px)`,
-          }}
-        >
-          {userInputBoard.map((row, y) =>
-            row.map((col, x) =>
-              col === 0 ? (
-                <div
-                  key={`${x}-${y}`}
-                  className={styles.cover}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleOnClick(e, y, x);
-                  }}
-                  onContextMenu={(e) => {
-                    e.preventDefault();
-                    handleOnClick(e, y, x);
-                  }}
-                  style={{ backgroundColor: '#c6c6c6' }}
-                />
-              ) : col === 10 || col === 9 ? (
-                <div
-                  key={`${x}-${y}`}
-                  className={styles.flag}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleOnClick(e, y, x);
-                  }}
-                  onContextMenu={(e) => {
-                    e.preventDefault();
-                    handleOnClick(e, y, x);
-                  }}
-                  style={{
-                    backgroundPositionX: col === 10 ? `-178px ` : `-158px`,
-                  }}
-                />
-              ) : col === 11 ? (
-                <div
-                  key={`${x}-${y}`}
-                  className={styles.cell}
-                  style={{ backgroundPositionX: '-300px' }}
-                />
-              ) : col === 21 ? (
-                <div
-                  key={`${x}-${y}`}
-                  className={styles.cell}
-                  style={{ backgroundPositionX: '-300px', backgroundColor: '#ef0000' }}
-                />
-              ) : (
-                <div
-                  key={`${x}-${y}`}
-                  className={styles.cell}
-                  style={{
-                    backgroundPositionX: col === -1 ? '30px' : `${(col - 1) * -30}px`,
-                  }}
-                />
+            className={styles.board}
+            style={{
+              gridTemplateRows: `repeat(${customBoard.height}, 30px)`,
+              gridTemplateColumns: `repeat(${customBoard.width}, 30px)`,
+            }}
+          >
+            {userInputBoard.map((row, y) =>
+              row.map((col, x) =>
+                col === 0 ? (
+                  <div
+                    key={`${x}-${y}`}
+                    className={styles.cover}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleOnClick(e, y, x);
+                    }}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      handleOnClick(e, y, x);
+                    }}
+                    style={{ backgroundColor: '#c6c6c6' }}
+                  />
+                ) : col === 10 || col === 9 ? (
+                  <div
+                    key={`${x}-${y}`}
+                    className={styles.flag}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleOnClick(e, y, x);
+                    }}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      handleOnClick(e, y, x);
+                    }}
+                    style={{
+                      backgroundPositionX: col === 10 ? `-178px ` : `-158px`,
+                    }}
+                  />
+                ) : col === 11 ? (
+                  <div
+                    key={`${x}-${y}`}
+                    className={styles.cell}
+                    style={{ backgroundPositionX: '-300px' }}
+                  />
+                ) : col === 21 ? (
+                  <div
+                    key={`${x}-${y}`}
+                    className={styles.cell}
+                    style={{ backgroundPositionX: '-300px', backgroundColor: '#ef0000' }}
+                  />
+                ) : (
+                  <div
+                    key={`${x}-${y}`}
+                    className={styles.cell}
+                    style={{
+                      backgroundPositionX: col === -1 ? '30px' : `${(col - 1) * -30}px`,
+                    }}
+                  />
+                ),
               ),
-            ),
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>

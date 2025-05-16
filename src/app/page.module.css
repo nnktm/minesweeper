@@ -8,6 +8,17 @@
   padding: 0 0.5rem;
 }
 
+.gameContent {
+  float: left;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+}
+
+.level {
+  margin-bottom: 20px;
+}
+
 .customBoard {
   display: flex;
   flex-direction: row;
