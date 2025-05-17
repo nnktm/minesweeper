@@ -291,7 +291,7 @@ const Home = () => {
           </div>
         )}
         <div className={styles.game}>
-          <div className={styles.info}>
+          <div className={styles.info} style={{ width: ` ${customBoard.width * 30}px` }}>
             <div className={styles.bombCount}>
               <div
                 className={styles.timerItem}

@@ -58,9 +58,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 279px;
+  width: fit-content;
   height: 60px;
-  margin: 10px 15px 0;
+  margin: 10px 15px 15px;
   background-color: #c6c6c6;
   border-top: solid 5px #808080;
   border-right: solid 5px #fff;
