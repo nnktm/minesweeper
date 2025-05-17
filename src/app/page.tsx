@@ -234,8 +234,13 @@ const Home = () => {
                 min="1"
                 value={customBoard.width}
                 onChange={(e) => {
-                  setCustomBoard((curr) => ({ ...curr, width: Number(e.target.value) }));
-                  handleOnSet();
+                  const newCustomBoard = { ...customBoard, width: Number(e.target.value) };
+                  setCustomBoard(newCustomBoard);
+                  setUserInputBoard(
+                    Array.from({ length: newCustomBoard.height }, () =>
+                      Array.from({ length: newCustomBoard.width }, () => 0),
+                    ),
+                  );
                 }}
                 className={styles.textBox}
               />
@@ -249,9 +254,13 @@ const Home = () => {
                 min="1"
                 value={customBoard.height}
                 onChange={(e) => {
-                  setCustomBoard((curr) => ({ ...curr, height: Number(e.target.value) }));
-                  console.log(customBoard.height);
-                  handleOnSet();
+                  const newCustomBoard = { ...customBoard, height: Number(e.target.value) };
+                  setCustomBoard(newCustomBoard);
+                  setUserInputBoard(
+                    Array.from({ length: newCustomBoard.height }, () =>
+                      Array.from({ length: newCustomBoard.width }, () => 0),
+                    ),
+                  );
                 }}
                 className={styles.textBox}
               />
@@ -265,8 +274,13 @@ const Home = () => {
                 min="1"
                 value={customBoard.bombCount}
                 onChange={(e) => {
-                  setCustomBoard((curr) => ({ ...curr, bombCount: Number(e.target.value) }));
-                  handleOnSet();
+                  const newCustomBoard = { ...customBoard, bombCount: Number(e.target.value) };
+                  setCustomBoard(newCustomBoard);
+                  setUserInputBoard(
+                    Array.from({ length: newCustomBoard.height }, () =>
+                      Array.from({ length: newCustomBoard.width }, () => 0),
+                    ),
+                  );
                 }}
                 className={styles.textBox}
               />
