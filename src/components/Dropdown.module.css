@@ -6,3 +6,10 @@
   border: 1px solid #ccc;
   border-radius: 5px;
 }
+
+@media (prefers-color-scheme: dark) {
+  .dropdownList {
+    color: #c8c3bc;
+    background-color: #181a1b;
+  }
+}

@@ -6,6 +6,8 @@ import styles from './page.module.css';
 
 const options = [{ value: '初級' }, { value: '中級' }, { value: '上級' }, { value: 'カスタム' }];
 
+const preferedDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
 const DIRECTIONS = [
   [0, -1],
   [1, -1],
@@ -69,6 +71,10 @@ const Home = () => {
   const handleOnSet = () => {
     if (customBoard.width < 1 || customBoard.height < 1 || customBoard.bombCount < 1) {
       alert('幅、高さ、爆弾数は1以上にしてください');
+      return;
+    }
+    if (customBoard.width > 99 || customBoard.height > 99 || customBoard.bombCount > 500) {
+      alert('幅、高さは99以下、爆弾数は500以下にしてください');
       return;
     }
     const initialBoard: number[][] = Array.from({ length: customBoard.height }, () =>
@@ -232,6 +238,7 @@ const Home = () => {
               <input
                 type="number"
                 min="1"
+                max="99"
                 value={customBoard.width}
                 onChange={(e) => {
                   const newCustomBoard = { ...customBoard, width: Number(e.target.value) };
@@ -252,6 +259,7 @@ const Home = () => {
               <input
                 type="number"
                 min="1"
+                max="99"
                 value={customBoard.height}
                 onChange={(e) => {
                   const newCustomBoard = { ...customBoard, height: Number(e.target.value) };
@@ -272,6 +280,7 @@ const Home = () => {
               <input
                 type="number"
                 min="1"
+                max="500"
                 value={customBoard.bombCount}
                 onChange={(e) => {
                   const newCustomBoard = { ...customBoard, bombCount: Number(e.target.value) };
@@ -371,7 +380,7 @@ const Home = () => {
                       e.preventDefault();
                       handleOnClick(e, y, x);
                     }}
-                    style={{ backgroundColor: '#c6c6c6' }}
+                    style={{ backgroundColor: preferedDark ? '#444e56' : '#c6c6c6' }}
                   />
                 ) : col === 10 || col === 9 ? (
                   <div
