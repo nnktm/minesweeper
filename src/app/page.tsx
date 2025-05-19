@@ -334,7 +334,7 @@ const Home = () => {
             <div
               className={styles.smile}
               onClick={handleOnReset}
-              style={{ backgroundPositionX: isBadEnd ? '-395px' : isGoodEnd ? '-365px' : '-335px' }}
+              style={{ backgroundPositionX: isBadEnd ? '-390px' : isGoodEnd ? '-360px' : '-330px' }}
             />
             <div className={styles.timer}>
               <div
