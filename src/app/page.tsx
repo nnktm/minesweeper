@@ -6,8 +6,6 @@ import styles from './page.module.css';
 
 const options = [{ value: '初級' }, { value: '中級' }, { value: '上級' }, { value: 'カスタム' }];
 
-const preferedDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
 const DIRECTIONS = [
   [0, -1],
   [1, -1],
@@ -66,6 +64,12 @@ const checkBomCount = (cy: number, cx: number, board: number[][]) => {
 };
 
 const Home = () => {
+  const [preferedDark, setPreferedDark] = useState(false);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setPreferedDark(window.matchMedia('(prefers-color-scheme: dark)').matches);
+    }
+  }, []);
   const [selectedOption, setSelectedOption] = useState<string>('初級');
   const [customBoard, setCustomBoard] = useState({ width: 9, height: 9, bombCount: 10 });
   const handleOnSet = () => {
