@@ -1,9 +1,9 @@
 'use client';
 
 import DropdownList from '@/components/DropdownList';
-import type { LevelKey } from '@/constants/options';
-import { LEVEL_KEYS } from '@/constants/options';
-import { useEffect, useState } from 'react';
+import type { BoardSetting, LevelKey } from '@/constants';
+import { LEVEL_KEYS, STANDARD_SETTINGS } from '@/constants';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './page.module.css';
 
 const DIRECTIONS = [
@@ -65,16 +65,18 @@ const checkBomCount = (cy: number, cx: number, board: number[][]) => {
 
 const Home = () => {
   const [preferedDark, setPreferedDark] = useState(false);
-  // const [customSetting, setCustomSetting] = useState<BoardSetting>({
-  //   width: 9,
-  //   height: 9,
-  //   bombCount: 10,
-  // });
+  const [customSetting, setCustomSetting] = useState<BoardSetting>({
+    width: 9,
+    height: 9,
+    bombCount: 10,
+  });
 
-  // const boardSettings: BoardSettings = {
-  //   ...STANDARD_SETTINGS,
-  //   custom: customSetting,
-  // };
+  const boardSettings = useMemo(() => {
+    return {
+      ...STANDARD_SETTINGS,
+      custom: customSetting,
+    };
+  }, [customSetting]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -82,18 +84,17 @@ const Home = () => {
     }
   }, []);
   const [selectedLevelKey, setSelectedLevelKey] = useState<LevelKey>(LEVEL_KEYS[0]);
-  const [customBoard, setCustomBoard] = useState({ width: 9, height: 9, bombCount: 10 });
   const handleOnSet = () => {
-    if (customBoard.width < 1 || customBoard.height < 1 || customBoard.bombCount < 1) {
+    if (customSetting.width < 1 || customSetting.height < 1 || customSetting.bombCount < 1) {
       alert('幅、高さ、爆弾数は1以上にしてください');
       return;
     }
-    if (customBoard.width > 99 || customBoard.height > 99 || customBoard.bombCount > 500) {
+    if (customSetting.width > 99 || customSetting.height > 99 || customSetting.bombCount > 500) {
       alert('幅、高さは99以下、爆弾数は500以下にしてください');
       return;
     }
-    const initialBoard: number[][] = Array.from({ length: customBoard.height }, () =>
-      Array.from({ length: customBoard.width }, () => 0),
+    const initialBoard: number[][] = Array.from({ length: customSetting.height }, () =>
+      Array.from({ length: customSetting.width }, () => 0),
     );
     setUserInputBoard(initialBoard);
     setBombMap(initialBoard);
@@ -110,32 +111,21 @@ const Home = () => {
   const handleOnSelect = (levelKey: LevelKey) => {
     setSelectedLevelKey(levelKey);
     setTimer(0);
-    if (levelKey === 'easy') {
-      setCustomBoard({ width: 9, height: 9, bombCount: 10 });
-      const newBoard = Array.from({ length: 9 }, () => Array.from({ length: 9 }, () => 0));
-      setUserInputBoard(newBoard);
-      setBombMap(newBoard);
-    } else if (levelKey === 'middle') {
-      setCustomBoard({ width: 16, height: 16, bombCount: 40 });
-      const newBoard = Array.from({ length: 16 }, () => Array.from({ length: 16 }, () => 0));
-      setUserInputBoard(newBoard);
-      setBombMap(newBoard);
-    } else if (levelKey === 'hard') {
-      setCustomBoard({ width: 30, height: 16, bombCount: 99 });
-      const newBoard = Array.from({ length: 16 }, () => Array.from({ length: 30 }, () => 0));
-      setUserInputBoard(newBoard);
-      setBombMap(newBoard);
-    } else if (levelKey === 'custom') {
-      setCustomBoard({ width: 10, height: 10, bombCount: 15 });
-      const newBoard = Array.from({ length: 10 }, () => Array.from({ length: 10 }, () => 0));
-      setUserInputBoard(newBoard);
-      setBombMap(newBoard);
+    const boardSetting = boardSettings[levelKey];
+    if (levelKey === 'custom') {
+      setCustomSetting(boardSetting);
     }
+    const newBoard = Array.from({ length: boardSetting.height }, () =>
+      Array.from({ length: boardSetting.width }, () => 0),
+    );
+    setUserInputBoard(newBoard);
+    setBombMap(newBoard);
   };
 
   const handleOnReset = () => {
-    const initialBoard: number[][] = Array.from({ length: customBoard.height }, () =>
-      Array.from({ length: customBoard.width }, () => 0),
+    const initialBoard: number[][] = Array.from(
+      { length: boardSettings[selectedLevelKey].height },
+      () => Array.from({ length: boardSettings[selectedLevelKey].width }, () => 0),
     );
     setUserInputBoard(initialBoard);
     setBombMap(initialBoard);
@@ -159,8 +149,8 @@ const Home = () => {
     }
 
     if (bombMap[y][x] === 1) {
-      for (let cy = 0; cy < customBoard.height; cy++) {
-        for (let cx = 0; cx < customBoard.width; cx++) {
+      for (let cy = 0; cy < boardSettings[selectedLevelKey].height; cy++) {
+        for (let cx = 0; cx < boardSettings[selectedLevelKey].width; cx++) {
           if (bombMap[cy][cx] === 1) {
             newUserInput[cy][cx] = 11;
           }
@@ -170,7 +160,13 @@ const Home = () => {
       setUserInputBoard(newUserInput);
       return;
     }
-    const newBombMap = shuffleBombMap(y, x, bombMap, userInputBoard, customBoard);
+    const newBombMap = shuffleBombMap(
+      y,
+      x,
+      bombMap,
+      userInputBoard,
+      boardSettings[selectedLevelKey],
+    );
     setBombMap(newBombMap);
     console.log(newBombMap);
     if (newBombMap[y][x] === 0) {
@@ -217,25 +213,29 @@ const Home = () => {
   };
   const isBadEnd =
     userInputBoard.flat().filter((num) => num === 11 || num === 21).length ===
-    customBoard.bombCount;
+    boardSettings[selectedLevelKey].bombCount;
 
   const isGoodEnd =
-    userInputBoard.flat().filter((num) => num === 0 || num === 10).length === customBoard.bombCount;
+    userInputBoard.flat().filter((num) => num === 0 || num === 10).length ===
+    boardSettings[selectedLevelKey].bombCount;
 
   useEffect(() => {
     if (isBadEnd || isGoodEnd) {
       return;
     }
-    if (bombMap.flat().filter((num) => num === 1).length === customBoard.bombCount) {
+    if (
+      bombMap.flat().filter((num) => num === 1).length === boardSettings[selectedLevelKey].bombCount
+    ) {
       const timerId = setInterval(() => {
         setTimer((time) => time + 1);
       }, 1000);
       return () => clearInterval(timerId);
     }
-  }, [bombMap, isBadEnd, isGoodEnd, customBoard]);
+  }, [boardSettings, bombMap, isBadEnd, isGoodEnd, selectedLevelKey]);
 
   const restBombCount =
-    customBoard.bombCount - userInputBoard.flat().filter((num) => num === 10).length;
+    boardSettings[selectedLevelKey].bombCount -
+    userInputBoard.flat().filter((num) => num === 10).length;
 
   return (
     <div className={styles.container}>
@@ -253,13 +253,13 @@ const Home = () => {
                 type="number"
                 min="1"
                 max="99"
-                value={customBoard.width}
+                value={customSetting.width}
                 onChange={(e) => {
-                  const newCustomBoard = { ...customBoard, width: Number(e.target.value) };
-                  setCustomBoard(newCustomBoard);
+                  const newCustomSetting = { ...customSetting, width: Number(e.target.value) };
+                  setCustomSetting(newCustomSetting);
                   setUserInputBoard(
-                    Array.from({ length: newCustomBoard.height }, () =>
-                      Array.from({ length: newCustomBoard.width }, () => 0),
+                    Array.from({ length: newCustomSetting.height }, () =>
+                      Array.from({ length: newCustomSetting.width }, () => 0),
                     ),
                   );
                 }}
@@ -274,13 +274,13 @@ const Home = () => {
                 type="number"
                 min="1"
                 max="99"
-                value={customBoard.height}
+                value={customSetting.height}
                 onChange={(e) => {
-                  const newCustomBoard = { ...customBoard, height: Number(e.target.value) };
-                  setCustomBoard(newCustomBoard);
+                  const newCustomSetting = { ...customSetting, height: Number(e.target.value) };
+                  setCustomSetting(newCustomSetting);
                   setUserInputBoard(
-                    Array.from({ length: newCustomBoard.height }, () =>
-                      Array.from({ length: newCustomBoard.width }, () => 0),
+                    Array.from({ length: newCustomSetting.height }, () =>
+                      Array.from({ length: newCustomSetting.width }, () => 0),
                     ),
                   );
                 }}
@@ -295,13 +295,13 @@ const Home = () => {
                 type="number"
                 min="1"
                 max="500"
-                value={customBoard.bombCount}
+                value={customSetting.bombCount}
                 onChange={(e) => {
-                  const newCustomBoard = { ...customBoard, bombCount: Number(e.target.value) };
-                  setCustomBoard(newCustomBoard);
+                  const newCustomSetting = { ...customSetting, bombCount: Number(e.target.value) };
+                  setCustomSetting(newCustomSetting);
                   setUserInputBoard(
-                    Array.from({ length: newCustomBoard.height }, () =>
-                      Array.from({ length: newCustomBoard.width }, () => 0),
+                    Array.from({ length: newCustomSetting.height }, () =>
+                      Array.from({ length: newCustomSetting.width }, () => 0),
                     ),
                   );
                 }}
@@ -314,7 +314,10 @@ const Home = () => {
           </div>
         )}
         <div className={styles.game}>
-          <div className={styles.info} style={{ width: ` ${customBoard.width * 30 + 8}px` }}>
+          <div
+            className={styles.info}
+            style={{ width: ` ${boardSettings[selectedLevelKey].width * 30 + 8}px` }}
+          >
             <div className={styles.bombCount}>
               <div
                 className={styles.timerItem}
@@ -376,8 +379,8 @@ const Home = () => {
           <div
             className={styles.board}
             style={{
-              gridTemplateRows: `repeat(${customBoard.height}, 30px)`,
-              gridTemplateColumns: `repeat(${customBoard.width}, 30px)`,
+              gridTemplateRows: `repeat(${boardSettings[selectedLevelKey].height}, 30px)`,
+              gridTemplateColumns: `repeat(${boardSettings[selectedLevelKey].width}, 30px)`,
             }}
           >
             {userInputBoard.map((row, y) =>
