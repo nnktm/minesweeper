@@ -1,10 +1,10 @@
 'use client';
 
 import DropdownList from '@/components/DropdownList';
+import type { LevelKey } from '@/constants/options';
+import { LEVEL_KEYS } from '@/constants/options';
 import { useEffect, useState } from 'react';
 import styles from './page.module.css';
-
-const options = [{ value: '初級' }, { value: '中級' }, { value: '上級' }, { value: 'カスタム' }];
 
 const DIRECTIONS = [
   [0, -1],
@@ -65,12 +65,23 @@ const checkBomCount = (cy: number, cx: number, board: number[][]) => {
 
 const Home = () => {
   const [preferedDark, setPreferedDark] = useState(false);
+  // const [customSetting, setCustomSetting] = useState<BoardSetting>({
+  //   width: 9,
+  //   height: 9,
+  //   bombCount: 10,
+  // });
+
+  // const boardSettings: BoardSettings = {
+  //   ...STANDARD_SETTINGS,
+  //   custom: customSetting,
+  // };
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setPreferedDark(window.matchMedia('(prefers-color-scheme: dark)').matches);
     }
   }, []);
-  const [selectedOption, setSelectedOption] = useState<string>('初級');
+  const [selectedLevelKey, setSelectedLevelKey] = useState<LevelKey>(LEVEL_KEYS[0]);
   const [customBoard, setCustomBoard] = useState({ width: 9, height: 9, bombCount: 10 });
   const handleOnSet = () => {
     if (customBoard.width < 1 || customBoard.height < 1 || customBoard.bombCount < 1) {
@@ -96,26 +107,25 @@ const Home = () => {
   );
   const [timer, setTimer] = useState(0);
 
-  const handleOnSelect = (value: string) => {
-    setSelectedOption(value);
-    console.log(value);
+  const handleOnSelect = (levelKey: LevelKey) => {
+    setSelectedLevelKey(levelKey);
     setTimer(0);
-    if (value === '初級') {
+    if (levelKey === 'easy') {
       setCustomBoard({ width: 9, height: 9, bombCount: 10 });
       const newBoard = Array.from({ length: 9 }, () => Array.from({ length: 9 }, () => 0));
       setUserInputBoard(newBoard);
       setBombMap(newBoard);
-    } else if (value === '中級') {
+    } else if (levelKey === 'middle') {
       setCustomBoard({ width: 16, height: 16, bombCount: 40 });
       const newBoard = Array.from({ length: 16 }, () => Array.from({ length: 16 }, () => 0));
       setUserInputBoard(newBoard);
       setBombMap(newBoard);
-    } else if (value === '上級') {
+    } else if (levelKey === 'hard') {
       setCustomBoard({ width: 30, height: 16, bombCount: 99 });
       const newBoard = Array.from({ length: 16 }, () => Array.from({ length: 30 }, () => 0));
       setUserInputBoard(newBoard);
       setBombMap(newBoard);
-    } else if (value === 'カスタム') {
+    } else if (levelKey === 'custom') {
       setCustomBoard({ width: 10, height: 10, bombCount: 15 });
       const newBoard = Array.from({ length: 10 }, () => Array.from({ length: 10 }, () => 0));
       setUserInputBoard(newBoard);
@@ -231,9 +241,9 @@ const Home = () => {
     <div className={styles.container}>
       <div className={styles.gameContent}>
         <div className={styles.level}>
-          <DropdownList options={options} onChange={handleOnSelect} value={selectedOption} />
+          <DropdownList levelKey={selectedLevelKey} onChange={handleOnSelect} />
         </div>
-        {selectedOption === 'カスタム' && (
+        {selectedLevelKey === 'custom' && (
           <div className={styles.customBoard}>
             <div className={styles.customBoardItem}>
               <label>

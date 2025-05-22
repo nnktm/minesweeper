@@ -1,23 +1,22 @@
+import { LEVEL_KEYS, LEVEL_NAMES, type LevelKey } from '@/constants/options';
 import React from 'react';
 import styles from './Dropdown.module.css';
 
 type DropdownListProps = {
-  options: { value: string }[];
-  onChange: (value: string) => void;
-  value: string;
+  onChange: (levelKey: LevelKey) => void;
+  levelKey: LevelKey;
 };
 
-const DropdownList: React.FC<DropdownListProps> = ({ options, onChange, value }) => {
+const DropdownList: React.FC<DropdownListProps> = ({ levelKey, onChange }) => {
   return (
     <select
       className={styles.dropdownList}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
+      value={levelKey}
+      onChange={(e) => onChange(e.target.value as LevelKey)}
     >
-      <option value="">選んでください</option>
-      {options.map((opt) => (
-        <option key={opt.value} value={opt.value}>
-          {opt.value}
+      {LEVEL_KEYS.map((key) => (
+        <option key={key} value={key}>
+          {LEVEL_NAMES[key]}
         </option>
       ))}
     </select>
