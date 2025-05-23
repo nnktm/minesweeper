@@ -31,7 +31,7 @@ function shuffleBombMap(
   if (bombMap.flat().filter((num) => num === 1).length === customBoard.bombCount) {
     return bombMap;
   }
-  if (userInputBoard.flat().filter((num) => num === -1).length !== 0) {
+  if (userInputBoard.flat().filter((num) => num === 1).length !== 0) {
     return bombMap;
   }
 
@@ -61,6 +61,87 @@ const checkBomCount = (cy: number, cx: number, board: number[][]) => {
     if (board[cy + dy][cx + dx] === 1) countBom++;
   }
   return countBom;
+};
+
+const bombExplosion = (bombMap: number[][], board: number[][]) => {
+  const bombExplosionCell: [number, number][] = [];
+  for (let cy = 0; cy < bombMap.length; cy++) {
+    for (let cx = 0; cx < bombMap[cy].length; cx++) {
+      if (bombMap[cy][cx] === 1) {
+        bombExplosionCell.push([cx, cy]);
+      }
+    }
+  }
+  for (const [cx, cy] of bombExplosionCell) {
+    board[cy][cx] = 11;
+  }
+  return board;
+};
+
+const calcBoard = (userInputBoard: number[][], bombMap: number[][]) => {
+  const board = Array.from({ length: userInputBoard.length }, () =>
+    Array.from({ length: userInputBoard[0].length }, () => 0),
+  );
+  for (let y = 0; y < board.length; y++) {
+    for (let x = 0; x < board[y].length; x++) {
+      if (userInputBoard[y] === undefined || userInputBoard[y][x] === undefined) continue;
+      if (userInputBoard[y][x] === 1) {
+        if (board[y][x] === 0) {
+          const zeroCell: [number, number][] = [];
+
+          const checkCell = (cy: number, cx: number) => {
+            if (zeroCell.some(([x, y]) => x === cx && y === cy)) return;
+            if (board[cy] === undefined || board[cy][cx] === undefined) return;
+            if (bombMap[cy][cx] !== 0) return;
+            let hasBomb = false;
+            for (const [dx, dy] of DIRECTIONS) {
+              if (bombMap[cy + dy] === undefined || bombMap[cy + dy][cx + dx] === undefined)
+                continue;
+              if (bombMap[cy + dy][cx + dx] === 1) {
+                hasBomb = true;
+                board[cy][cx] = checkBomCount(cy, cx, bombMap);
+                break;
+              }
+            }
+            if (!hasBomb) {
+              zeroCell.push([cx, cy]);
+              for (const [dx, dy] of DIRECTIONS) {
+                if (bombMap[cy + dy] === undefined || bombMap[cy + dy][cx + dx] === undefined)
+                  continue;
+                if (bombMap[cy + dy][cx + dx] === 0) {
+                  checkCell(cy + dy, cx + dx);
+                }
+              }
+            }
+          };
+
+          checkCell(y, x);
+          for (const [x, y] of zeroCell) {
+            board[y][x] = -1;
+          }
+        }
+      }
+      if (userInputBoard[y][x] === 2) {
+        board[y][x] = 10;
+      }
+      if (userInputBoard[y][x] === 3) {
+        board[y][x] = 9;
+      }
+    }
+  }
+  for (let y = 0; y < board.length; y++) {
+    for (let x = 0; x < board[y].length; x++) {
+      if (userInputBoard[y] === undefined || userInputBoard[y][x] === undefined) continue;
+      if (userInputBoard[y][x] === 1) {
+        if (bombMap[y][x] === 1) {
+          bombExplosion(bombMap, board);
+          board[y][x] = 21;
+          return board;
+        }
+      }
+    }
+  }
+  return board;
 };
 
 const Home = () => {
@@ -107,6 +188,7 @@ const Home = () => {
     Array.from({ length: 9 }, () => Array.from({ length: 9 }, () => 0)),
   );
   const [timer, setTimer] = useState(0);
+  const board = calcBoard(userInputBoard, bombMap);
 
   const handleOnSelect = (levelKey: LevelKey) => {
     setSelectedLevelKey(levelKey);
@@ -133,33 +215,22 @@ const Home = () => {
   };
 
   const handleOnClick = (e: React.MouseEvent, y: number, x: number) => {
-    if (isBadEnd || isGoodEnd) return;
-    if (userInputBoard[y][x] === -1) return;
     const newUserInput = structuredClone(userInputBoard);
+    if (isBadEnd || isGoodEnd) return;
     if (e.button === 2) {
-      if (newUserInput[y][x] === 10) {
-        newUserInput[y][x] = 9;
-      } else if (newUserInput[y][x] === 9) {
+      if (newUserInput[y][x] === 2) {
+        newUserInput[y][x] = 3;
+      } else if (newUserInput[y][x] === 3) {
         newUserInput[y][x] = 0;
       } else {
-        newUserInput[y][x] = 10;
+        newUserInput[y][x] = 2;
       }
       setUserInputBoard(newUserInput);
       return;
     }
+    if (userInputBoard[y][x] === 1 || userInputBoard[y][x] === 2 || userInputBoard[y][x] === 3)
+      return;
 
-    if (bombMap[y][x] === 1) {
-      for (let cy = 0; cy < boardSettings[selectedLevelKey].height; cy++) {
-        for (let cx = 0; cx < boardSettings[selectedLevelKey].width; cx++) {
-          if (bombMap[cy][cx] === 1) {
-            newUserInput[cy][cx] = 11;
-          }
-        }
-      }
-      newUserInput[y][x] = 21;
-      setUserInputBoard(newUserInput);
-      return;
-    }
     const newBombMap = shuffleBombMap(
       y,
       x,
@@ -168,55 +239,16 @@ const Home = () => {
       boardSettings[selectedLevelKey],
     );
     setBombMap(newBombMap);
-    console.log(newBombMap);
-    if (newBombMap[y][x] === 0) {
-      if (userInputBoard[y][x] === 0) {
-        const zeroCell: [number, number][] = [];
 
-        const checkCell = (cy: number, cx: number) => {
-          if (zeroCell.some(([x, y]) => x === cx && y === cy)) return;
-
-          if (newBombMap[cy][cx] !== 0) return;
-
-          let hasBomb = false;
-          for (const [dx, dy] of DIRECTIONS) {
-            if (newBombMap[cy + dy] === undefined || newBombMap[cy + dy][cx + dx] === undefined)
-              continue;
-            if (newBombMap[cy + dy][cx + dx] === 1) {
-              hasBomb = true;
-              newUserInput[cy][cx] = checkBomCount(cy, cx, newBombMap);
-              break;
-            }
-          }
-
-          if (!hasBomb) {
-            zeroCell.push([cx, cy]);
-            for (const [dx, dy] of DIRECTIONS) {
-              if (newBombMap[cy + dy] === undefined || newBombMap[cy + dy][cx + dx] === undefined)
-                continue;
-              if (newBombMap[cy + dy][cx + dx] === 0) {
-                checkCell(cy + dy, cx + dx);
-              }
-            }
-          }
-        };
-
-        checkCell(y, x);
-
-        for (const [x, y] of zeroCell) {
-          newUserInput[y][x] = -1;
-        }
-        setUserInputBoard(newUserInput);
-      }
-    }
-    console.log(newUserInput);
+    newUserInput[y][x] = 1;
+    setUserInputBoard(newUserInput);
   };
   const isBadEnd =
-    userInputBoard.flat().filter((num) => num === 11 || num === 21).length ===
+    board.flat().filter((num) => num === 11 || num === 21).length ===
     boardSettings[selectedLevelKey].bombCount;
 
   const isGoodEnd =
-    userInputBoard.flat().filter((num) => num === 0 || num === 10).length ===
+    board.flat().filter((num) => num === 0 || num === 10).length ===
     boardSettings[selectedLevelKey].bombCount;
 
   useEffect(() => {
@@ -383,7 +415,7 @@ const Home = () => {
               gridTemplateColumns: `repeat(${boardSettings[selectedLevelKey].width}, 30px)`,
             }}
           >
-            {userInputBoard.map((row, y) =>
+            {board.map((row, y) =>
               row.map((col, x) =>
                 col === 0 ? (
                   <div
