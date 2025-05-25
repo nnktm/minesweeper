@@ -34,23 +34,18 @@ function shuffleBombMap(
   if (userInputBoard.flat().filter((num) => num === 1).length !== 0) {
     return bombMap;
   }
-
   let bombCount = 0;
   const maxBombs = customBoard.bombCount;
-
   const newBombMap = structuredClone(bombMap);
   while (bombCount < maxBombs) {
     const cy = Math.floor(Math.random() * customBoard.height);
     const cx = Math.floor(Math.random() * customBoard.width);
-
     if (cy === y && cx === x) continue;
-
     if (newBombMap[cy][cx] === 0) {
       newBombMap[cy][cx] = 1;
       bombCount++;
     }
   }
-
   return newBombMap;
 }
 
@@ -190,6 +185,28 @@ const Home = () => {
   const [timer, setTimer] = useState(0);
   const board = calcBoard(userInputBoard, bombMap);
 
+  const gameStatus: 'badEnd' | 'goodEnd' | 'waiting' | 'playing' = useMemo(() => {
+    if (
+      board.flat().filter((num) => num === 0).length ===
+      boardSettings[selectedLevelKey].width * boardSettings[selectedLevelKey].height
+    ) {
+      return 'waiting';
+    }
+    if (
+      board.flat().filter((num) => num === 0 || num === 10).length ===
+      boardSettings[selectedLevelKey].bombCount
+    ) {
+      return 'goodEnd';
+    }
+    if (
+      board.flat().filter((num) => num === 11 || num === 21).length ===
+      boardSettings[selectedLevelKey].bombCount
+    ) {
+      return 'badEnd';
+    }
+    return 'playing';
+  }, [board, boardSettings, selectedLevelKey]);
+
   const handleOnSelect = (levelKey: LevelKey) => {
     setSelectedLevelKey(levelKey);
     setTimer(0);
@@ -205,6 +222,7 @@ const Home = () => {
   };
 
   const handleOnReset = () => {
+    console.log(gameStatus);
     const initialBoard: number[][] = Array.from(
       { length: boardSettings[selectedLevelKey].height },
       () => Array.from({ length: boardSettings[selectedLevelKey].width }, () => 0),
@@ -216,7 +234,7 @@ const Home = () => {
 
   const handleOnClick = (e: React.MouseEvent, y: number, x: number) => {
     const newUserInput = structuredClone(userInputBoard);
-    if (isBadEnd || isGoodEnd) return;
+    if (gameStatus === 'badEnd' || gameStatus === 'goodEnd') return;
     if (e.button === 2) {
       if (newUserInput[y][x] === 2) {
         newUserInput[y][x] = 3;
@@ -243,16 +261,9 @@ const Home = () => {
     newUserInput[y][x] = 1;
     setUserInputBoard(newUserInput);
   };
-  const isBadEnd =
-    board.flat().filter((num) => num === 11 || num === 21).length ===
-    boardSettings[selectedLevelKey].bombCount;
-
-  const isGoodEnd =
-    board.flat().filter((num) => num === 0 || num === 10).length ===
-    boardSettings[selectedLevelKey].bombCount;
 
   useEffect(() => {
-    if (isBadEnd || isGoodEnd) {
+    if (gameStatus === 'badEnd' || gameStatus === 'goodEnd') {
       return;
     }
     if (
@@ -263,11 +274,10 @@ const Home = () => {
       }, 1000);
       return () => clearInterval(timerId);
     }
-  }, [boardSettings, bombMap, isBadEnd, isGoodEnd, selectedLevelKey]);
+  }, [boardSettings, bombMap, gameStatus, selectedLevelKey]);
 
   const restBombCount =
-    boardSettings[selectedLevelKey].bombCount -
-    userInputBoard.flat().filter((num) => num === 10).length;
+    boardSettings[selectedLevelKey].bombCount - board.flat().filter((num) => num === 10).length;
 
   return (
     <div className={styles.container}>
@@ -379,7 +389,14 @@ const Home = () => {
             <div
               className={styles.smile}
               onClick={handleOnReset}
-              style={{ backgroundPositionX: isBadEnd ? '-390px' : isGoodEnd ? '-360px' : '-330px' }}
+              style={{
+                backgroundPositionX:
+                  gameStatus === 'badEnd'
+                    ? '-390px'
+                    : gameStatus === 'goodEnd'
+                      ? '-360px'
+                      : '-330px',
+              }}
             />
             <div className={styles.timer}>
               <div
