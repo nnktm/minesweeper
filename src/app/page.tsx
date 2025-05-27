@@ -52,29 +52,24 @@ const checkBomCount = (cy: number, cx: number, board: number[][]) => {
   return countBom;
 };
 
-const bombExplosion = (bombMap: number[][], board: number[][]) => {
-  const bombExplosionCell: [number, number][] = [];
-  for (let cy = 0; cy < bombMap.length; cy++) {
-    for (let cx = 0; cx < bombMap[cy].length; cx++) {
-      if (bombMap[cy][cx] === 1) {
-        bombExplosionCell.push([cx, cy]);
-      }
-    }
-  }
-  for (const [cx, cy] of bombExplosionCell) {
-    board[cy][cx] = 11;
-  }
-  return board;
-};
-
 const calcBoard = (userInputBoard: number[][], bombMap: number[][]) => {
   const board = Array.from({ length: userInputBoard.length }, () =>
     Array.from({ length: userInputBoard[0].length }, () => 0),
   );
+  const bombExplosionCell: [number, number][] = [];
+  let bombExplosion = false;
+  const clickBombExplosionCell: [number, number][] = [];
   for (let y = 0; y < board.length; y++) {
     for (let x = 0; x < board[y].length; x++) {
       if (userInputBoard[y] === undefined || userInputBoard[y][x] === undefined) continue;
+      if (bombMap[y][x] === 1) {
+        bombExplosionCell.push([x, y]);
+      }
       if (userInputBoard[y][x] === 1) {
+        if (bombMap[y][x] === 1) {
+          bombExplosion = true;
+          clickBombExplosionCell.push([x, y]);
+        }
         if (board[y][x] === 0) {
           const zeroCell: [number, number][] = [];
 
@@ -118,16 +113,12 @@ const calcBoard = (userInputBoard: number[][], bombMap: number[][]) => {
       }
     }
   }
-  for (let y = 0; y < board.length; y++) {
-    for (let x = 0; x < board[y].length; x++) {
-      if (userInputBoard[y] === undefined || userInputBoard[y][x] === undefined) continue;
-      if (userInputBoard[y][x] === 1) {
-        if (bombMap[y][x] === 1) {
-          bombExplosion(bombMap, board);
-          board[y][x] = 21;
-          return board;
-        }
-      }
+  if (bombExplosion) {
+    for (const [cx, cy] of bombExplosionCell) {
+      board[cy][cx] = 11;
+    }
+    for (const [cx, cy] of clickBombExplosionCell) {
+      board[cy][cx] = 21;
     }
   }
   return board;
