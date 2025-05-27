@@ -17,7 +17,7 @@ const DIRECTIONS = [
   [-1, -1],
 ];
 
-function shuffleBombMap(
+const shuffleBombMap = (
   y: number,
   x: number,
   bombMap: number[][],
@@ -27,13 +27,7 @@ function shuffleBombMap(
     height: number;
     bombCount: number;
   },
-) {
-  if (bombMap.flat().filter((num) => num === 1).length === customBoard.bombCount) {
-    return bombMap;
-  }
-  if (userInputBoard.flat().filter((num) => num === 1).length !== 0) {
-    return bombMap;
-  }
+) => {
   let bombCount = 0;
   const maxBombs = customBoard.bombCount;
   const newBombMap = structuredClone(bombMap);
@@ -47,7 +41,7 @@ function shuffleBombMap(
     }
   }
   return newBombMap;
-}
+};
 
 const checkBomCount = (cy: number, cx: number, board: number[][]) => {
   let countBom = 0;
@@ -248,27 +242,23 @@ const Home = () => {
     }
     if (userInputBoard[y][x] === 1 || userInputBoard[y][x] === 2 || userInputBoard[y][x] === 3)
       return;
-
-    const newBombMap = shuffleBombMap(
-      y,
-      x,
-      bombMap,
-      userInputBoard,
-      boardSettings[selectedLevelKey],
-    );
-    setBombMap(newBombMap);
+    if (gameStatus === 'waiting') {
+      const newBombMap = shuffleBombMap(
+        y,
+        x,
+        bombMap,
+        userInputBoard,
+        boardSettings[selectedLevelKey],
+      );
+      setBombMap(newBombMap);
+    }
 
     newUserInput[y][x] = 1;
     setUserInputBoard(newUserInput);
   };
 
   useEffect(() => {
-    if (gameStatus === 'badEnd' || gameStatus === 'goodEnd') {
-      return;
-    }
-    if (
-      bombMap.flat().filter((num) => num === 1).length === boardSettings[selectedLevelKey].bombCount
-    ) {
+    if (gameStatus === 'playing') {
       const timerId = setInterval(() => {
         setTimer((time) => time + 1);
       }, 1000);
