@@ -65,7 +65,7 @@ const calcBoard = (userInputBoard: number[][], bombMap: number[][]) => {
       if (bombMap[y][x] === 1) {
         bombExplosionCell.push([x, y]);
       }
-      if (userInputBoard[y][x] === 1) {
+      if (userInputBoard[y][x] === 3) {
         if (bombMap[y][x] === 1) {
           bombExplosion = true;
           clickBombExplosionCell.push([x, y]);
@@ -105,10 +105,10 @@ const calcBoard = (userInputBoard: number[][], bombMap: number[][]) => {
           }
         }
       }
-      if (userInputBoard[y][x] === 2) {
+      if (userInputBoard[y][x] === 1) {
         board[y][x] = 10;
       }
-      if (userInputBoard[y][x] === 3) {
+      if (userInputBoard[y][x] === 2) {
         board[y][x] = 9;
       }
     }
@@ -221,18 +221,11 @@ const Home = () => {
     const newUserInput = structuredClone(userInputBoard);
     if (gameStatus === 'badEnd' || gameStatus === 'goodEnd') return;
     if (e.button === 2) {
-      if (newUserInput[y][x] === 2) {
-        newUserInput[y][x] = 3;
-      } else if (newUserInput[y][x] === 3) {
-        newUserInput[y][x] = 0;
-      } else {
-        newUserInput[y][x] = 2;
-      }
+      newUserInput[y][x] = (newUserInput[y][x] + 1) % 3;
       setUserInputBoard(newUserInput);
       return;
     }
-    if (userInputBoard[y][x] === 1 || userInputBoard[y][x] === 2 || userInputBoard[y][x] === 3)
-      return;
+    if (newUserInput[y][x] !== 0) return;
     if (gameStatus === 'waiting') {
       const newBombMap = shuffleBombMap(
         y,
@@ -244,7 +237,7 @@ const Home = () => {
       setBombMap(newBombMap);
     }
 
-    newUserInput[y][x] = 1;
+    newUserInput[y][x] = 3;
     setUserInputBoard(newUserInput);
   };
 
