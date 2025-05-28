@@ -139,11 +139,6 @@ const Home = () => {
     };
   }, [customSetting]);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setPreferedDark(window.matchMedia('(prefers-color-scheme: dark)').matches);
-    }
-  }, []);
   const [selectedLevelKey, setSelectedLevelKey] = useState<LevelKey>(LEVEL_KEYS[0]);
   const handleOnSet = () => {
     if (customSetting.width < 1 || customSetting.height < 1 || customSetting.bombCount < 1) {
@@ -240,6 +235,10 @@ const Home = () => {
     newUserInput[y][x] = 3;
     setUserInputBoard(newUserInput);
   };
+
+  useEffect(() => {
+    setPreferedDark(window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }, []);
 
   useEffect(() => {
     if (gameStatus === 'playing') {
