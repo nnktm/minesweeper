@@ -145,8 +145,12 @@ const Home = () => {
       alert('幅、高さ、爆弾数は1以上にしてください');
       return;
     }
-    if (customSetting.width > 99 || customSetting.height > 99 || customSetting.bombCount > 500) {
-      alert('幅、高さは99以下、爆弾数は500以下にしてください');
+    if (
+      customSetting.width > 99 ||
+      customSetting.height > 99 ||
+      customSetting.bombCount > customSetting.width * customSetting.height - 1
+    ) {
+      alert('幅、高さは99以下、爆弾数はマスの数より少なくしてください');
       return;
     }
     const initialBoard: number[][] = Array.from({ length: customSetting.height }, () =>
@@ -309,7 +313,7 @@ const Home = () => {
               <input
                 type="number"
                 min="1"
-                max="500"
+                max={customSetting.width * customSetting.height - 1}
                 value={customSetting.bombCount}
                 onChange={(e) => {
                   const newCustomSetting = { ...customSetting, bombCount: Number(e.target.value) };
@@ -406,59 +410,66 @@ const Home = () => {
             }}
           >
             {board.map((row, y) =>
-              row.map((col, x) =>
-                col === 0 ? (
-                  <div
-                    key={`${x}-${y}`}
-                    className={styles.cover}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleOnClick(e, y, x);
-                    }}
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-                      handleOnClick(e, y, x);
-                    }}
-                    style={{ backgroundColor: preferedDark ? '#444e56' : '#c6c6c6' }}
-                  />
-                ) : col === 10 || col === 9 ? (
-                  <div
-                    key={`${x}-${y}`}
-                    className={styles.flag}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleOnClick(e, y, x);
-                    }}
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-                      handleOnClick(e, y, x);
-                    }}
-                    style={{
-                      backgroundPositionX: col === 10 ? `-178px ` : `-158px`,
-                    }}
-                  />
-                ) : col === 11 ? (
-                  <div
-                    key={`${x}-${y}`}
-                    className={styles.cell}
-                    style={{ backgroundPositionX: '-300px' }}
-                  />
-                ) : col === 21 ? (
-                  <div
-                    key={`${x}-${y}`}
-                    className={styles.cell}
-                    style={{ backgroundPositionX: '-300px', backgroundColor: '#ef0000' }}
-                  />
-                ) : (
-                  <div
-                    key={`${x}-${y}`}
-                    className={styles.cell}
-                    style={{
-                      backgroundPositionX: col === -1 ? '30px' : `${(col - 1) * -30}px`,
-                    }}
-                  />
-                ),
-              ),
+              row.map((col, x) => {
+                // クリック可能なセル
+                if (col === 0 || col === 10 || col === 9) {
+                  return (
+                    <div key={`${x}-${y}`} className="canClick">
+                      {col === 0 ? (
+                        <div
+                          className={styles.cover}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleOnClick(e, y, x);
+                          }}
+                          onContextMenu={(e) => {
+                            e.preventDefault();
+                            handleOnClick(e, y, x);
+                          }}
+                          style={{ backgroundColor: preferedDark ? '#444e56' : '#c6c6c6' }}
+                        />
+                      ) : (
+                        <div
+                          className={styles.flag}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleOnClick(e, y, x);
+                          }}
+                          onContextMenu={(e) => {
+                            e.preventDefault();
+                            handleOnClick(e, y, x);
+                          }}
+                          style={{
+                            backgroundPositionX: col === 10 ? `-178px ` : `-158px`,
+                          }}
+                        />
+                      )}
+                    </div>
+                  );
+                }
+
+                // クリック不可能なセル
+                return (
+                  <div key={`${x}-${y}`} className="cantClick">
+                    {col === 11 || col === 21 ? (
+                      <div
+                        className={styles.cell}
+                        style={{
+                          backgroundPositionX: '-300px',
+                          backgroundColor: col === 21 ? '#ef0000' : '',
+                        }}
+                      />
+                    ) : (
+                      <div
+                        className={styles.cell}
+                        style={{
+                          backgroundPositionX: col === -1 ? '30px' : `${(col - 1) * -30}px`,
+                        }}
+                      />
+                    )}
+                  </div>
+                );
+              }),
             )}
           </div>
         </div>
