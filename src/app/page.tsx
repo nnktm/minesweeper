@@ -247,7 +247,7 @@ const Home = () => {
       }, 1000);
       return () => clearInterval(timerId);
     }
-  }, [boardSettings, bombMap, gameStatus, selectedLevelKey]);
+  }, [gameStatus]);
 
   const restBombCount =
     boardSettings[selectedLevelKey].bombCount - board.flat().filter((num) => num === 10).length;
