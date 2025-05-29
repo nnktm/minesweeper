@@ -74,7 +74,6 @@ const calcBoard = (userInputBoard: number[][], bombMap: number[][]) => {
 
           const checkCell = (cy: number, cx: number) => {
             if (zeroCell.some(([x, y]) => x === cx && y === cy)) return;
-            if (board[cy] === undefined || board[cy][cx] === undefined) return;
             if (bombMap[cy][cx] !== 0) return;
             let hasBomb = false;
             for (const [dx, dy] of DIRECTIONS) {
