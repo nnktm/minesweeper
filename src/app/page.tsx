@@ -61,7 +61,6 @@ const calcBoard = (userInputBoard: number[][], bombMap: number[][]) => {
   const clickBombExplosionCell: [number, number][] = [];
   for (let y = 0; y < board.length; y++) {
     for (let x = 0; x < board[y].length; x++) {
-      if (userInputBoard[y] === undefined || userInputBoard[y][x] === undefined) continue;
       if (bombMap[y][x] === 1) {
         bombExplosionCell.push([x, y]);
       }
