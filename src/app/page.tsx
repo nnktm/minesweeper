@@ -203,14 +203,16 @@ const Home = () => {
     setTimer(0);
   };
 
+  const handleOnContextMenu = (e: React.MouseEvent, y: number, x: number) => {
+    const newUserInput = structuredClone(userInputBoard);
+    if (gameStatus === 'badEnd' || gameStatus === 'goodEnd' || gameStatus === 'waiting') return;
+    newUserInput[y][x] = (newUserInput[y][x] + 1) % 3;
+    setUserInputBoard(newUserInput);
+  };
+
   const handleOnClick = (e: React.MouseEvent, y: number, x: number) => {
     const newUserInput = structuredClone(userInputBoard);
     if (gameStatus === 'badEnd' || gameStatus === 'goodEnd') return;
-    if (e.button === 2) {
-      newUserInput[y][x] = (newUserInput[y][x] + 1) % 3;
-      setUserInputBoard(newUserInput);
-      return;
-    }
     if (newUserInput[y][x] !== 0) return;
     if (gameStatus === 'waiting') {
       const newBombMap = shuffleBombMap(
@@ -222,7 +224,6 @@ const Home = () => {
       );
       setBombMap(newBombMap);
     }
-
     newUserInput[y][x] = 3;
     setUserInputBoard(newUserInput);
   };
@@ -440,7 +441,7 @@ const Home = () => {
                       }}
                       onContextMenu={(e) => {
                         e.preventDefault();
-                        handleOnClick(e, y, x);
+                        handleOnContextMenu(e, y, x);
                       }}
                       style={
                         col === 0
