@@ -153,16 +153,6 @@
 .cover {
   width: 30px;
   aspect-ratio: 1;
-  background-color: #c6c6c6;
-  border-top: solid 4px #fff;
-  border-right: solid 4px #808080;
-  border-bottom: solid 4px #808080;
-  border-left: solid 4px #fff;
-}
-
-.flag {
-  width: 30px;
-  aspect-ratio: 1;
   background: url('~/src/assets/images/image.png') no-repeat;
   background-size: 280px 20px;
   border-top: solid 4px #fff;
@@ -265,14 +255,6 @@
   }
 
   .cover {
-    background-color: #444e56;
-    border-top: solid 4px #788087;
-    border-right: solid 4px #222a32;
-    border-bottom: solid 4px #222a32;
-    border-left: solid 4px #788087;
-  }
-
-  .flag {
     background-color: #444e56;
     border-top: solid 4px #788087;
     border-right: solid 4px #222a32;
