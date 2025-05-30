@@ -56,6 +56,7 @@ const calcBoard = (userInputBoard: number[][], bombMap: number[][]) => {
   const board = Array.from({ length: userInputBoard.length }, () =>
     Array.from({ length: userInputBoard[0].length }, () => 0),
   );
+  if (userInputBoard.length !== userInputBoard[0].length) return board;
   const bombExplosionCell: [number, number][] = [];
   let bombExplosion = false;
   const clickBombExplosionCell: [number, number][] = [];
@@ -139,18 +140,6 @@ const Home = () => {
 
   const [selectedLevelKey, setSelectedLevelKey] = useState<LevelKey>(LEVEL_KEYS[0]);
   const handleOnSet = () => {
-    if (customSetting.width < 1 || customSetting.height < 1 || customSetting.bombCount < 1) {
-      alert('幅、高さ、爆弾数は1以上にしてください');
-      return;
-    }
-    if (
-      customSetting.width > 99 ||
-      customSetting.height > 99 ||
-      customSetting.bombCount > customSetting.width * customSetting.height - 1
-    ) {
-      alert('幅、高さは99以下、爆弾数はマスの数より少なくしてください');
-      return;
-    }
     const initialBoard: number[][] = Array.from({ length: customSetting.height }, () =>
       Array.from({ length: customSetting.width }, () => 0),
     );
@@ -272,6 +261,17 @@ const Home = () => {
                 max="99"
                 value={customSetting.width}
                 onChange={(e) => {
+                  if (
+                    Number(e.target.value) * customSetting.height <
+                    boardSettings[selectedLevelKey].bombCount
+                  ) {
+                    alert('幅と高さの積は爆弾数より多くしてください');
+                    return;
+                  }
+                  if (Number(e.target.value) > 99) {
+                    alert('幅は99以下にしてください');
+                    return;
+                  }
                   const newCustomSetting = { ...customSetting, width: Number(e.target.value) };
                   setCustomSetting(newCustomSetting);
                   setUserInputBoard(
@@ -293,6 +293,17 @@ const Home = () => {
                 max="99"
                 value={customSetting.height}
                 onChange={(e) => {
+                  if (
+                    Number(e.target.value) * customSetting.width <
+                    boardSettings[selectedLevelKey].bombCount
+                  ) {
+                    alert('幅と高さの積は爆弾数より大きくしてください');
+                    return;
+                  }
+                  if (Number(e.target.value) > 99) {
+                    alert('高さは99以下にしてください');
+                    return;
+                  }
                   const newCustomSetting = { ...customSetting, height: Number(e.target.value) };
                   setCustomSetting(newCustomSetting);
                   setUserInputBoard(
@@ -314,6 +325,14 @@ const Home = () => {
                 max={customSetting.width * customSetting.height - 1}
                 value={customSetting.bombCount}
                 onChange={(e) => {
+                  if (Number(e.target.value) > customSetting.width * customSetting.height - 1) {
+                    alert('爆弾数はマスの数より少なくしてください');
+                    return;
+                  }
+                  if (Number(e.target.value) < 1) {
+                    alert('爆弾数は1以上にしてください');
+                    return;
+                  }
                   const newCustomSetting = { ...customSetting, bombCount: Number(e.target.value) };
                   setCustomSetting(newCustomSetting);
                   setUserInputBoard(
