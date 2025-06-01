@@ -43,14 +43,8 @@ const shuffleBombMap = (
   return newBombMap;
 };
 
-const checkBomCount = (cy: number, cx: number, board: number[][]) => {
-  let countBom = 0;
-  for (const [dx, dy] of DIRECTIONS) {
-    if (board[cy + dy] === undefined || board[cy + dy][cx + dx] === undefined) continue;
-    if (board[cy + dy][cx + dx] === 1) countBom++;
-  }
-  return countBom;
-};
+const checkBomCount = (cy: number, cx: number, board: number[][]) =>
+  DIRECTIONS.filter(([dx, dy]) => board[cy + dy]?.[cx + dx] === 1).length;
 
 const calcBoard = (userInputBoard: number[][], bombMap: number[][]) => {
   const board = Array.from({ length: userInputBoard.length }, () =>
