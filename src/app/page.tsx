@@ -21,7 +21,6 @@ const shuffleBombMap = (
   y: number,
   x: number,
   bombMap: number[][],
-  userInputBoard: number[][],
   customBoard: {
     width: number;
     height: number;
@@ -209,13 +208,7 @@ const Home = () => {
     if (gameStatus === 'badEnd' || gameStatus === 'goodEnd') return;
     if (newUserInput[y][x] !== 0) return;
     if (gameStatus === 'waiting') {
-      const newBombMap = shuffleBombMap(
-        y,
-        x,
-        bombMap,
-        userInputBoard,
-        boardSettings[selectedLevelKey],
-      );
+      const newBombMap = shuffleBombMap(y, x, bombMap, boardSettings[selectedLevelKey]);
       setBombMap(newBombMap);
     }
     newUserInput[y][x] = 3;
@@ -350,30 +343,19 @@ const Home = () => {
             style={{ width: ` ${boardSettings[selectedLevelKey].width * 30 + 8}px` }}
           >
             <div className={styles.bombCount}>
-              <div
-                className={styles.timerItem}
-                style={
-                  restBombCount / 100 > 0
-                    ? { backgroundPositionX: `${Math.floor(restBombCount / 100) * -27.5}px` }
-                    : { backgroundPositionX: '0px' }
-                }
-              />
-              <div
-                className={styles.timerItem}
-                style={
-                  restBombCount / 10 > 0
-                    ? { backgroundPositionX: `${Math.floor((restBombCount % 100) / 10) * -27.5}px` }
-                    : { backgroundPositionX: '0px' }
-                }
-              />
-              <div
-                className={styles.timerItem}
-                style={
-                  restBombCount % 10 > 0
-                    ? { backgroundPositionX: `${(restBombCount % 10) * -27.5}px` }
-                    : { backgroundPositionX: '0px' }
-                }
-              />
+              {[
+                restBombCount / 100 > 0 ? `${Math.floor(restBombCount / 100) * -27.5}px` : '0px',
+                restBombCount / 10 > 0
+                  ? `${Math.floor((restBombCount % 100) / 10) * -27.5}px`
+                  : '0px',
+                restBombCount % 10 > 0 ? `${(restBombCount % 10) * -27.5}px` : '0px',
+              ].map((m, i) => (
+                <div
+                  key={`${i}-${m}`}
+                  className={styles.timerItem}
+                  style={{ backgroundPositionX: m }}
+                />
+              ))}
             </div>
             <div
               className={styles.smile}
@@ -388,30 +370,17 @@ const Home = () => {
               }}
             />
             <div className={styles.timer}>
-              <div
-                className={styles.timerItem}
-                style={
-                  timer / 100 > 0
-                    ? { backgroundPositionX: `${Math.floor(timer / 100) * -27.5}px` }
-                    : { backgroundPositionX: '0px' }
-                }
-              />
-              <div
-                className={styles.timerItem}
-                style={
-                  timer / 10 > 0
-                    ? { backgroundPositionX: `${Math.floor((timer % 100) / 10) * -27.5}px` }
-                    : { backgroundPositionX: '0px' }
-                }
-              />
-              <div
-                className={styles.timerItem}
-                style={
-                  timer % 10 > 0
-                    ? { backgroundPositionX: `${(timer % 10) * -27.5}px` }
-                    : { backgroundPositionX: '0px' }
-                }
-              />
+              {[
+                timer / 100 > 0 ? `${Math.floor(timer / 100) * -27.5}px` : '0px',
+                timer / 10 > 0 ? `${Math.floor((timer % 100) / 10) * -27.5}px` : '0px',
+                timer % 10 > 0 ? `${(timer % 10) * -27.5}px` : '0px',
+              ].map((m, i) => (
+                <div
+                  key={`${i}-${m}`}
+                  className={styles.timerItem}
+                  style={{ backgroundPositionX: m }}
+                />
+              ))}
             </div>
           </div>
           <div
