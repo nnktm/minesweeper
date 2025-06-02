@@ -199,7 +199,7 @@ const Home = () => {
 
   const handleOnContextMenu = (e: React.MouseEvent, y: number, x: number) => {
     const newUserInput = structuredClone(userInputBoard);
-    if (gameStatus === 'badEnd' || gameStatus === 'goodEnd' || gameStatus === 'waiting') return;
+    if (gameStatus !== 'playing') return;
     newUserInput[y][x] = (newUserInput[y][x] + 1) % 3;
     setUserInputBoard(newUserInput);
   };
