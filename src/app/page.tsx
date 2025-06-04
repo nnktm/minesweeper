@@ -197,6 +197,7 @@ const Home = () => {
   };
 
   const handleOnContextMenu = (e: React.MouseEvent, y: number, x: number) => {
+    e.preventDefault();
     const newUserInput = structuredClone(userInputBoard);
     if (gameStatus !== 'playing') return;
     newUserInput[y][x] = (newUserInput[y][x] + 1) % 3;
@@ -204,6 +205,7 @@ const Home = () => {
   };
 
   const handleOnClick = (e: React.MouseEvent, y: number, x: number) => {
+    e.preventDefault();
     const newUserInput = structuredClone(userInputBoard);
     if (gameStatus === 'badEnd' || gameStatus === 'goodEnd') return;
     if (newUserInput[y][x] !== 0) return;
@@ -399,11 +401,9 @@ const Home = () => {
                       key={`${x}-${y}`}
                       className={styles.cover}
                       onClick={(e) => {
-                        e.preventDefault();
                         handleOnClick(e, y, x);
                       }}
                       onContextMenu={(e) => {
-                        e.preventDefault();
                         handleOnContextMenu(e, y, x);
                       }}
                       style={
