@@ -27,19 +27,18 @@ const shuffleBombMap = (
     bombCount: number;
   },
 ) => {
-  let bombCount = 0;
-  const maxBombs = customBoard.bombCount;
   const newBombMap = structuredClone(bombMap);
-  while (bombCount < maxBombs) {
-    const cy = Math.floor(Math.random() * customBoard.height);
-    const cx = Math.floor(Math.random() * customBoard.width);
-    if (cy === y && cx === x) continue;
-    if (newBombMap[cy][cx] === 0) {
+  return (
+    Array.from({ length: customBoard.bombCount }, () => {
+      let cy: number, cx: number;
+      do {
+        cy = Math.floor(Math.random() * customBoard.height);
+        cx = Math.floor(Math.random() * customBoard.width);
+      } while ((cy === y && cx === x) || newBombMap[cy][cx] === 1);
       newBombMap[cy][cx] = 1;
-      bombCount++;
-    }
-  }
-  return newBombMap;
+      return newBombMap;
+    }).pop() || newBombMap
+  );
 };
 
 const checkBomCount = (cy: number, cx: number, board: number[][]) =>
@@ -175,9 +174,8 @@ const Home = () => {
     setSelectedLevelKey(levelKey);
     setTimer(0);
     const boardSetting = boardSettings[levelKey];
-    if (levelKey === 'custom') {
-      setCustomSetting(boardSetting);
-    }
+    levelKey === 'custom' ? setCustomSetting(boardSetting) : null;
+
     const newBoard = Array.from({ length: boardSetting.height }, () =>
       Array.from({ length: boardSetting.width }, () => 0),
     );
@@ -199,9 +197,9 @@ const Home = () => {
   const handleOnContextMenu = (e: React.MouseEvent, y: number, x: number) => {
     e.preventDefault();
     const newUserInput = structuredClone(userInputBoard);
-    if (gameStatus !== 'playing') return;
-    newUserInput[y][x] = (newUserInput[y][x] + 1) % 3;
-    setUserInputBoard(newUserInput);
+    gameStatus === 'playing'
+      ? ((newUserInput[y][x] = (newUserInput[y][x] + 1) % 3), setUserInputBoard(newUserInput))
+      : null;
   };
 
   const handleOnClick = (e: React.MouseEvent, y: number, x: number) => {
