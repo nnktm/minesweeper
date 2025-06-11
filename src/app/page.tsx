@@ -248,24 +248,25 @@ const Home = () => {
                 max="99"
                 value={customSetting.width}
                 onChange={(e) => {
-                  if (
-                    Number(e.target.value) * customSetting.height <
-                    boardSettings[selectedLevelKey].bombCount
-                  ) {
-                    alert('幅と高さの積は爆弾数より多くしてください');
-                    return;
-                  }
-                  if (Number(e.target.value) > 99) {
-                    alert('幅は99以下にしてください');
-                    return;
-                  }
-                  const newCustomSetting = { ...customSetting, width: Number(e.target.value) };
-                  setCustomSetting(newCustomSetting);
-                  setUserInputBoard(
-                    Array.from({ length: newCustomSetting.height }, () =>
-                      Array.from({ length: newCustomSetting.width }, () => 0),
-                    ),
-                  );
+                  Number(e.target.value) * customSetting.height <
+                  boardSettings[selectedLevelKey].bombCount
+                    ? alert(
+                        `幅と高さの積(${Number(e.target.value) * customSetting.height})は爆弾数(${boardSettings[selectedLevelKey].bombCount})より大きくしてください`,
+                      )
+                    : Number(e.target.value) > 99
+                      ? alert(`幅は99以下にしてください（現在の値: ${Number(e.target.value)}）`)
+                      : (() => {
+                          const newCustomSetting = {
+                            ...customSetting,
+                            width: Number(e.target.value),
+                          };
+                          setCustomSetting(newCustomSetting);
+                          setUserInputBoard(
+                            Array.from({ length: newCustomSetting.height }, () =>
+                              Array.from({ length: newCustomSetting.width }, () => 0),
+                            ),
+                          );
+                        })();
                 }}
                 className={styles.textBox}
               />
@@ -280,24 +281,25 @@ const Home = () => {
                 max="99"
                 value={customSetting.height}
                 onChange={(e) => {
-                  if (
-                    Number(e.target.value) * customSetting.width <
-                    boardSettings[selectedLevelKey].bombCount
-                  ) {
-                    alert('幅と高さの積は爆弾数より大きくしてください');
-                    return;
-                  }
-                  if (Number(e.target.value) > 99) {
-                    alert('高さは99以下にしてください');
-                    return;
-                  }
-                  const newCustomSetting = { ...customSetting, height: Number(e.target.value) };
-                  setCustomSetting(newCustomSetting);
-                  setUserInputBoard(
-                    Array.from({ length: newCustomSetting.height }, () =>
-                      Array.from({ length: newCustomSetting.width }, () => 0),
-                    ),
-                  );
+                  Number(e.target.value) * customSetting.width <
+                  boardSettings[selectedLevelKey].bombCount
+                    ? alert(
+                        `幅と高さの積(${Number(e.target.value) * customSetting.width})は爆弾数(${boardSettings[selectedLevelKey].bombCount})より大きくしてください`,
+                      )
+                    : Number(e.target.value) > 99
+                      ? alert(`高さは99以下にしてください（現在の値: ${Number(e.target.value)}）`)
+                      : (() => {
+                          const newCustomSetting = {
+                            ...customSetting,
+                            height: Number(e.target.value),
+                          };
+                          setCustomSetting(newCustomSetting);
+                          setUserInputBoard(
+                            Array.from({ length: newCustomSetting.height }, () =>
+                              Array.from({ length: newCustomSetting.width }, () => 0),
+                            ),
+                          );
+                        })();
                 }}
                 className={styles.textBox}
               />
@@ -312,21 +314,24 @@ const Home = () => {
                 max={customSetting.width * customSetting.height - 1}
                 value={customSetting.bombCount}
                 onChange={(e) => {
-                  if (Number(e.target.value) > customSetting.width * customSetting.height - 1) {
-                    alert('爆弾数はマスの数より少なくしてください');
-                    return;
-                  }
-                  if (Number(e.target.value) < 1) {
-                    alert('爆弾数は1以上にしてください');
-                    return;
-                  }
-                  const newCustomSetting = { ...customSetting, bombCount: Number(e.target.value) };
-                  setCustomSetting(newCustomSetting);
-                  setUserInputBoard(
-                    Array.from({ length: newCustomSetting.height }, () =>
-                      Array.from({ length: newCustomSetting.width }, () => 0),
-                    ),
-                  );
+                  Number(e.target.value) > customSetting.width * customSetting.height - 1
+                    ? alert(
+                        `爆弾数はマスの数(${customSetting.width * customSetting.height})より少なくしてください（現在の値: ${Number(e.target.value)}）`,
+                      )
+                    : Number(e.target.value) < 1
+                      ? alert(`爆弾数は1以上にしてください（現在の値: ${Number(e.target.value)}）`)
+                      : (() => {
+                          const newCustomSetting = {
+                            ...customSetting,
+                            bombCount: Number(e.target.value),
+                          };
+                          setCustomSetting(newCustomSetting);
+                          setUserInputBoard(
+                            Array.from({ length: newCustomSetting.height }, () =>
+                              Array.from({ length: newCustomSetting.width }, () => 0),
+                            ),
+                          );
+                        })();
                 }}
                 className={styles.textBox}
               />
@@ -390,30 +395,26 @@ const Home = () => {
             {board.map((row, y) =>
               row.map((col, x) => {
                 // クリック可能なセル
-                if (col === 0 || col === 10 || col === 9) {
-                  return (
-                    <div
-                      key={`${x}-${y}`}
-                      className={styles.cover}
-                      onClick={(e) => {
-                        handleOnClick(e, y, x);
-                      }}
-                      onContextMenu={(e) => {
-                        handleOnContextMenu(e, y, x);
-                      }}
-                      style={
-                        col === 0
-                          ? {
-                              backgroundColor: preferedDark ? '#444e56' : '#c6c6c6',
-                              backgroundPositionX: '30px',
-                            }
-                          : { backgroundPositionX: col === 10 ? `-178px ` : `-158px` }
-                      }
-                    />
-                  );
-                }
-                // クリック不可能なセル
-                return (
+                return col === 0 || col === 10 || col === 9 ? (
+                  <div
+                    key={`${x}-${y}`}
+                    className={styles.cover}
+                    onClick={(e) => {
+                      handleOnClick(e, y, x);
+                    }}
+                    onContextMenu={(e) => {
+                      handleOnContextMenu(e, y, x);
+                    }}
+                    style={
+                      col === 0
+                        ? {
+                            backgroundColor: preferedDark ? '#444e56' : '#c6c6c6',
+                            backgroundPositionX: '30px',
+                          }
+                        : { backgroundPositionX: col === 10 ? `-178px ` : `-158px` }
+                    }
+                  />
+                ) : (
                   <div
                     key={`${x}-${y}`}
                     className={styles.cell}
