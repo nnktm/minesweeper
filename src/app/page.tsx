@@ -26,20 +26,19 @@ const shuffleBombMap = (
     height: number;
     bombCount: number;
   },
-) => {
-  const newBombMap = structuredClone(bombMap);
-  return (
-    Array.from({ length: customBoard.bombCount }, () => {
+) =>
+  Array.from({ length: customBoard.bombCount }, () => {
+    const [cy, cx] = (() => {
       let cy: number, cx: number;
       do {
         cy = Math.floor(Math.random() * customBoard.height);
         cx = Math.floor(Math.random() * customBoard.width);
-      } while ((cy === y && cx === x) || newBombMap[cy][cx] === 1);
-      newBombMap[cy][cx] = 1;
-      return newBombMap;
-    }).pop() || newBombMap
-  );
-};
+      } while ((cy === y && cx === x) || bombMap[cy][cx] === 1);
+      return [cy, cx];
+    })();
+    bombMap[cy][cx] = 1;
+    return bombMap;
+  }).pop() || structuredClone(bombMap);
 
 const checkBomCount = (cy: number, cx: number, board: number[][]) =>
   DIRECTIONS.filter(([dx, dy]) => board[cy + dy]?.[cx + dx] === 1).length;
@@ -344,16 +343,14 @@ const Home = () => {
           >
             <div className={styles.bombCount}>
               {[
-                restBombCount / 100 > 0 ? `${Math.floor(restBombCount / 100) * -27.5}px` : '0px',
-                restBombCount / 10 > 0
-                  ? `${Math.floor((restBombCount % 100) / 10) * -27.5}px`
-                  : '0px',
-                restBombCount % 10 > 0 ? `${(restBombCount % 10) * -27.5}px` : '0px',
+                restBombCount / 100 > 0 ? Math.floor(restBombCount / 100) * -27.5 : 0,
+                restBombCount / 10 > 0 ? Math.floor((restBombCount % 100) / 10) * -27.5 : 0,
+                restBombCount % 10 > 0 ? (restBombCount % 10) * -27.5 : 0,
               ].map((m, i) => (
                 <div
                   key={`${i}-${m}`}
                   className={styles.timerItem}
-                  style={{ backgroundPositionX: m }}
+                  style={{ backgroundPositionX: `${m}px` }}
                 />
               ))}
             </div>
@@ -371,14 +368,14 @@ const Home = () => {
             />
             <div className={styles.timer}>
               {[
-                timer / 100 > 0 ? `${Math.floor(timer / 100) * -27.5}px` : '0px',
-                timer / 10 > 0 ? `${Math.floor((timer % 100) / 10) * -27.5}px` : '0px',
-                timer % 10 > 0 ? `${(timer % 10) * -27.5}px` : '0px',
+                timer / 100 > 0 ? Math.floor(timer / 100) * -27.5 : 0,
+                timer / 10 > 0 ? Math.floor((timer % 100) / 10) * -27.5 : 0,
+                timer % 10 > 0 ? (timer % 10) * -27.5 : 0,
               ].map((m, i) => (
                 <div
                   key={`${i}-${m}`}
                   className={styles.timerItem}
-                  style={{ backgroundPositionX: m }}
+                  style={{ backgroundPositionX: `${m}px` }}
                 />
               ))}
             </div>
