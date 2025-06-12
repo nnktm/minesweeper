@@ -219,12 +219,13 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    if (gameStatus === 'playing') {
-      const timerId = setInterval(() => {
-        setTimer((time) => time + 1);
-      }, 1000);
-      return () => clearInterval(timerId);
-    }
+    const timerId =
+      gameStatus === 'playing'
+        ? setInterval(() => {
+            setTimer((time) => time + 1);
+          }, 1000)
+        : undefined;
+    return () => timerId && clearInterval(timerId);
   }, [gameStatus]);
 
   const restBombCount =
