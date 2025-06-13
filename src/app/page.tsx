@@ -204,14 +204,21 @@ const Home = () => {
   const handleOnClick = (e: React.MouseEvent, y: number, x: number) => {
     e.preventDefault();
     const newUserInput = structuredClone(userInputBoard);
-    if (gameStatus === 'badEnd' || gameStatus === 'goodEnd') return;
-    if (newUserInput[y][x] !== 0) return;
-    if (gameStatus === 'waiting') {
-      const newBombMap = shuffleBombMap(y, x, bombMap, boardSettings[selectedLevelKey]);
-      setBombMap(newBombMap);
-    }
-    newUserInput[y][x] = 3;
-    setUserInputBoard(newUserInput);
+    gameStatus === 'badEnd' || gameStatus === 'goodEnd'
+      ? null
+      : newUserInput[y][x] !== 0
+        ? null
+        : gameStatus === 'waiting'
+          ? (() => {
+              const newBombMap = shuffleBombMap(y, x, bombMap, boardSettings[selectedLevelKey]);
+              setBombMap(newBombMap);
+              newUserInput[y][x] = 3;
+              setUserInputBoard(newUserInput);
+            })()
+          : (() => {
+              newUserInput[y][x] = 3;
+              setUserInputBoard(newUserInput);
+            })();
   };
 
   useEffect(() => {
