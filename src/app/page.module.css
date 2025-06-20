@@ -22,28 +22,6 @@
   margin-bottom: 20px;
 }
 
-.customBoard {
-  display: flex;
-  flex-direction: row;
-}
-
-.customBoardItem {
-  display: flex;
-  flex-direction: column;
-}
-
-.textBox {
-  width: 40px;
-  height: 20px;
-  margin-right: 10px;
-}
-
-.setButton {
-  width: 60px;
-  height: 30px;
-  margin: 10px;
-}
-
 .game {
   display: flex;
   flex-direction: column;
