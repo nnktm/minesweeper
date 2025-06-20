@@ -1,0 +1,118 @@
+.info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+  margin-top: 15px;
+  margin-right: 15px;
+  margin-left: 15px;
+  background-color: #c6c6c6;
+  border-top: solid 5px #808080;
+  border-right: solid 5px #fff;
+  border-bottom: solid 5px #fff;
+  border-left: solid 5px #808080;
+}
+
+.smile {
+  width: 40px;
+  aspect-ratio: 1;
+  background: url('~/src/assets/images/image.png') no-repeat;
+  background-color: #c6c6c6;
+  background-size: cover;
+  border-top: solid 5px #fff;
+  border-right: solid 5px #808080;
+  border-bottom: solid 5px #808080;
+  border-left: solid 5px #fff;
+}
+
+.smile:active {
+  border-top: solid 5px #808080;
+  border-right: solid 5px #fff;
+  border-bottom: solid 5px #fff;
+  border-left: solid 5px #808080;
+}
+
+.timer {
+  display: flex;
+  flex-direction: row;
+  margin: 5px;
+  margin-left: auto;
+  border-top: solid 2px #808080;
+  border-right: solid 2px #fff;
+  border-bottom: solid 2px #fff;
+  border-left: solid 2px #808080;
+}
+
+.timerItem {
+  width: 25px;
+  height: 40px;
+  background: url('~/src/assets/images/timer.png') no-repeat;
+  background-color: #c6c6c6;
+  background-size: 275px 40px;
+}
+
+.bombCount {
+  display: flex;
+  flex-direction: row;
+  margin: 5px;
+  margin-right: auto;
+  border-top: solid 2px #808080;
+  border-right: solid 2px #fff;
+  border-bottom: solid 2px #fff;
+  border-left: solid 2px #808080;
+}
+
+.bombCountItem {
+  width: 25px;
+  height: 40px;
+  background: url('~/src/assets/images/timer.png') no-repeat;
+  background-color: #c6c6c6;
+  background-size: 275px 50px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .info {
+    background-color: #444e56;
+    border-top: solid 5px #222a32;
+    border-right: solid 5px #788087;
+    border-bottom: solid 5px #788087;
+    border-left: solid 5px #222a32;
+  }
+
+  .smile {
+    background-color: #444e56;
+    border-top: solid 5px #788087;
+    border-right: solid 5px #222a32;
+    border-bottom: solid 5px #222a32;
+    border-left: solid 5px #788087;
+  }
+
+  .smile:active {
+    border-top: solid 5px #222a32;
+    border-right: solid 5px #788087;
+    border-bottom: solid 5px #788087;
+    border-left: solid 5px #222a32;
+  }
+
+  .timer {
+    border-top: solid 2px #222a32;
+    border-right: solid 2px #788087;
+    border-bottom: solid 2px #788087;
+    border-left: solid 2px #222a32;
+  }
+
+  .timerItem {
+    background-color: #444e56;
+  }
+
+  .bombCount {
+    border-top: solid 2px #222a32;
+    border-right: solid 2px #788087;
+    border-bottom: solid 2px #788087;
+    border-left: solid 2px #222a32;
+  }
+
+  .bombCountItem {
+    background-color: #444e56;
+  }
+}

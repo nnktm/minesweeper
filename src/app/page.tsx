@@ -2,6 +2,7 @@
 
 import CustomSetting from '@/components/CustomSetting';
 import DropdownList from '@/components/DropdownList';
+import Info from '@/components/Info';
 import type { BoardSetting, LevelKey } from '@/constants';
 import { LEVEL_KEYS, STANDARD_SETTINGS } from '@/constants';
 import { useEffect, useMemo, useState } from 'react';
@@ -148,7 +149,9 @@ const Home = () => {
   const [timer, setTimer] = useState(0);
   const board = calcBoard(userInputBoard, bombMap);
 
-  const gameStatus: 'badEnd' | 'goodEnd' | 'waiting' | 'playing' = useMemo(() => {
+  type GameStatus = 'badEnd' | 'goodEnd' | 'waiting' | 'playing';
+
+  const gameStatus: GameStatus = useMemo(() => {
     if (
       board.flat().filter((num) => num === 0).length ===
       boardSettings[selectedLevelKey].width * boardSettings[selectedLevelKey].height
@@ -256,49 +259,14 @@ const Home = () => {
           />
         )}
         <div className={styles.game}>
-          <div
-            className={styles.info}
-            style={{ width: ` ${boardSettings[selectedLevelKey].width * 30 + 8}px` }}
-          >
-            <div className={styles.bombCount}>
-              {[
-                restBombCount / 100 > 0 ? Math.floor(restBombCount / 100) * -27.5 : 0,
-                restBombCount / 10 > 0 ? Math.floor((restBombCount % 100) / 10) * -27.5 : 0,
-                restBombCount % 10 > 0 ? (restBombCount % 10) * -27.5 : 0,
-              ].map((m, i) => (
-                <div
-                  key={`${i}-${m}`}
-                  className={styles.timerItem}
-                  style={{ backgroundPositionX: `${m}px` }}
-                />
-              ))}
-            </div>
-            <div
-              className={styles.smile}
-              onClick={handleOnReset}
-              style={{
-                backgroundPositionX:
-                  gameStatus === 'badEnd'
-                    ? '-390px'
-                    : gameStatus === 'goodEnd'
-                      ? '-360px'
-                      : '-330px',
-              }}
-            />
-            <div className={styles.timer}>
-              {[
-                timer / 100 > 0 ? Math.floor(timer / 100) * -27.5 : 0,
-                timer / 10 > 0 ? Math.floor((timer % 100) / 10) * -27.5 : 0,
-                timer % 10 > 0 ? (timer % 10) * -27.5 : 0,
-              ].map((m, i) => (
-                <div
-                  key={`${i}-${m}`}
-                  className={styles.timerItem}
-                  style={{ backgroundPositionX: `${m}px` }}
-                />
-              ))}
-            </div>
-          </div>
+          <Info
+            boardSettings={boardSettings}
+            selectedLevelKey={selectedLevelKey}
+            restBombCount={restBombCount}
+            timer={timer}
+            gameStatus={gameStatus}
+            handleOnReset={handleOnReset}
+          />
           <div
             className={styles.board}
             style={{
