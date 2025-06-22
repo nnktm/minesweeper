@@ -50,7 +50,6 @@ const calcBoard = (userInputBoard: number[][], bombMap: number[][]) => {
   const board = Array.from({ length: userInputBoard.length }, () =>
     Array.from({ length: userInputBoard[0].length }, () => 0),
   );
-  if (userInputBoard.length !== userInputBoard[0].length) return board;
   const bombExplosionCell: [number, number][] = [];
   let bombExplosion = false;
   const clickBombExplosionCell: [number, number][] = [];
@@ -208,6 +207,7 @@ const Home = () => {
 
   const handleOnClick = (e: React.MouseEvent, y: number, x: number) => {
     e.preventDefault();
+    console.log(gameStatus, y, x, customSetting);
     const newUserInput = structuredClone(userInputBoard);
     gameStatus === 'badEnd' || gameStatus === 'goodEnd'
       ? null
@@ -256,7 +256,9 @@ const Home = () => {
             customSetting={customSetting}
             setCustomSetting={setCustomSetting}
             setUserInputBoard={setUserInputBoard}
+            setBombMap={setBombMap}
             handleOnSet={handleOnSet}
+            setTimer={setTimer}
           />
         )}
         <div className={styles.game}>

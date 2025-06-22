@@ -6,8 +6,10 @@ type CustomSettingProps = {
   boardSettings: BoardSettings;
   selectedLevelKey: LevelKey;
   customSetting: BoardSetting;
+  setTimer: (timer: number) => void;
   setCustomSetting: (customSetting: BoardSetting) => void;
   setUserInputBoard: (userInputBoard: number[][]) => void;
+  setBombMap: (bombMap: number[][]) => void;
   handleOnSet: () => void;
 };
 
@@ -15,8 +17,10 @@ const CustomSetting: React.FC<CustomSettingProps> = ({
   boardSettings,
   selectedLevelKey,
   customSetting,
+  setTimer,
   setCustomSetting,
   setUserInputBoard,
+  setBombMap,
   handleOnSet,
 }) => {
   return (
@@ -43,12 +47,13 @@ const CustomSetting: React.FC<CustomSettingProps> = ({
                       ...customSetting,
                       width: Number(e.target.value),
                     };
+                    setTimer(0);
                     setCustomSetting(newCustomSetting);
-                    setUserInputBoard(
-                      Array.from({ length: newCustomSetting.height }, () =>
-                        Array.from({ length: newCustomSetting.width }, () => 0),
-                      ),
+                    const newBoard = Array.from({ length: newCustomSetting.height }, () =>
+                      Array.from({ length: newCustomSetting.width }, () => 0),
                     );
+                    setUserInputBoard(newBoard);
+                    setBombMap(newBoard);
                   })();
           }}
           className={styles.textBox}
@@ -76,11 +81,11 @@ const CustomSetting: React.FC<CustomSettingProps> = ({
                       height: Number(e.target.value),
                     };
                     setCustomSetting(newCustomSetting);
-                    setUserInputBoard(
-                      Array.from({ length: newCustomSetting.height }, () =>
-                        Array.from({ length: newCustomSetting.width }, () => 0),
-                      ),
+                    const newBoard = Array.from({ length: newCustomSetting.height }, () =>
+                      Array.from({ length: newCustomSetting.width }, () => 0),
                     );
+                    setUserInputBoard(newBoard);
+                    setBombMap(newBoard);
                   })();
           }}
           className={styles.textBox}
@@ -108,11 +113,11 @@ const CustomSetting: React.FC<CustomSettingProps> = ({
                       bombCount: Number(e.target.value),
                     };
                     setCustomSetting(newCustomSetting);
-                    setUserInputBoard(
-                      Array.from({ length: newCustomSetting.height }, () =>
-                        Array.from({ length: newCustomSetting.width }, () => 0),
-                      ),
+                    const newBoard = Array.from({ length: newCustomSetting.height }, () =>
+                      Array.from({ length: newCustomSetting.width }, () => 0),
                     );
+                    setUserInputBoard(newBoard);
+                    setBombMap(newBoard);
                   })();
           }}
           className={styles.textBox}
