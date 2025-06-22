@@ -1,6 +1,6 @@
 import type { BoardSettings, LevelKey } from '@/constants';
 import React from 'react';
-import styles from './Board.module.css';
+import styles from './styles/Board.module.css';
 type BoardProps = {
   board: number[][];
   boardSettings: BoardSettings;

@@ -1,6 +1,6 @@
 import { LEVEL_KEYS, LEVEL_NAMES, type LevelKey } from '@/constants';
 import React from 'react';
-import styles from './Dropdown.module.css';
+import styles from './styles/DropdownList.module.css';
 
 type DropdownListProps = {
   onChange: (levelKey: LevelKey) => void;

@@ -1,6 +1,6 @@
 import type { BoardSettings, LevelKey } from '@/constants';
 import React from 'react';
-import styles from './Info.module.css';
+import styles from './styles/Info.module.css';
 
 type GameStatus = 'badEnd' | 'goodEnd' | 'waiting' | 'playing';
 

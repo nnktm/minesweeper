@@ -1,6 +1,6 @@
 import type { BoardSetting, BoardSettings, LevelKey } from '@/constants';
 import React from 'react';
-import styles from './CustomSetting.module.css';
+import styles from './styles/CustomSetting.module.css';
 
 type CustomSettingProps = {
   boardSettings: BoardSettings;
